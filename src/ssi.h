@@ -9,6 +9,9 @@
 #ifndef _SSI_H
 #define _SSI_H
 
+#include <opencv2/imgcodecs/imgcodecs_c.h>
+#include <opencv2/highgui/highgui_c.h>
+#include <stdio.h>
 
 
 #endif
