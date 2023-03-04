@@ -14,7 +14,7 @@
 #include <dlib/image_io.h>
 #include <iostream>
 #include <dlib/opencv.h>
-#include <opencv4/opencv2/opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <vector>
 #include <ctime>
 
@@ -25,14 +25,11 @@
 using namespace std;
 //using namespace cv;
 
-void line_one_face_detections(cv::Mat img, std::vector<dlib::full_object_detection> fs)
-{
+void line_one_face_detections (cv::Mat img, std::vector<dlib::full_object_detection> fs) {
     int i, j;
-    for(j=0; j<fs.size(); j++)
-    {
+    for (j=0; j<fs.size(); j++) {
         cv::Point p1, p2;
-        for(i = 0; i<67; i++)
-        {
+        for (i = 0; i<67; i++) {
             // 下巴到脸颊 0 ~ 16
             //左边眉毛 17 ~ 21
             //右边眉毛 21 ~ 26
@@ -42,8 +39,7 @@ void line_one_face_detections(cv::Mat img, std::vector<dlib::full_object_detecti
             //右眼        42 ~ 47
             //嘴唇外圈  48 ~ 59
             //嘴唇内圈  59 ~ 67
-            switch(i)
-            {
+            switch (i) {
                 case 16:
                 case 21:
                 case 26:
@@ -68,10 +64,8 @@ void line_one_face_detections(cv::Mat img, std::vector<dlib::full_object_detecti
 }
 
 
-int main(int argc, char *argv[])
-{
-    if(argc != 2)
-    {
+int main (int argc, char *argv[]) {
+    if (argc != 2) {
         std::cout<< "you should specified a picture!"<<std::endl;
         return 0;
     }
@@ -103,15 +97,13 @@ int main(int argc, char *argv[])
     //获取人脸特征点分布
     std::vector<dlib::full_object_detection> shapes;
     int i = 0;
-    for(i = 0; i < dets.size(); i++)
-    {
+    for (i = 0; i < dets.size(); i++) {
         dlib::full_object_detection shape = sp(dimg, dets[i]); //获取指定一个区域的人脸形状
         shapes.push_back(shape); 
     }   
 
     //指出每个检测到的人脸的位置
-    for(i=0; i<dets.size(); i++)
-    {
+    for (i=0; i<dets.size(); i++) {
         //画出人脸所在区域
         cv::Rect r;
         r.x = dets[i].left();
