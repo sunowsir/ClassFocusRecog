@@ -2,7 +2,7 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include "./ssi_window.h"
+#include "ssi_window.h"
 
 int main(int argc, char *argv[])
 {

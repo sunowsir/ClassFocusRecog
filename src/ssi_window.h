@@ -12,9 +12,13 @@
 #include <QWidget>
 #include <QMainWindow>
 
+#include "ssi_widget.h"
+
 class SSI_Window : public QMainWindow
 {
     Q_OBJECT
+
+    SSI_Widget  *ssi_widget;
 
 public:
     SSI_Window(QWidget *parent = nullptr);
