@@ -52,6 +52,7 @@ SSI_Widget::~SSI_Widget() {
 void SSI_Widget::get_camera_list() {
     if (QMediaDevices::videoInputs().count() <= 0) {
         qDebug() << "[ERROR] no video inputs devices";
+        QMessageBox::critical(this, tr("错误"), tr("找不到摄像头"));
         return ;
     }
 

@@ -14,6 +14,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QCoreApplication>
 
 #include <QtMultimedia>
@@ -27,12 +28,17 @@ private:
     QSettings       *settings;
 
     QMainWindow     *parent;
+
+/* 组件 */
     
     /* 打开摄像头的按钮 */
     QPushButton     *open_camera;
 
     /* 列出摄像头下拉列表 */
     QComboBox       *camera_list;
+
+
+/* 数据 */
 
     /* 列出摄像头名称列表 */
     QStringList     *camera_name_list;
