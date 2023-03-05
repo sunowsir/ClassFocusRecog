@@ -22,7 +22,20 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     /* open camera button */
     this->open_camera = new QPushButton(this);
     this->open_camera->setText(tr("打开摄像头"));
-    this->open_camera->move(260, 385);
+    this->open_camera->move(260, 400);
+    this->open_camera->resize(80, 30);
+
+    this->cameras_list = new QList<std::pair<QString, QCamera*>>;
+    this->camera_name_list = new QStringList;
+
+    /* 获取摄像头列表 */
+    this->get_camera_list();
+
+    /* camera list */
+    this->camera_list = new QComboBox(this);
+    this->camera_list->move(50, 400);
+    this->camera_list->resize(150, 30);
+    this->camera_list->addItems(*this->camera_name_list);
 
     
     /* connect signal with slot */
@@ -34,6 +47,23 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
 SSI_Widget::~SSI_Widget() {
     delete this->open_camera;
     delete this->settings;
+}
+
+void SSI_Widget::get_camera_list() {
+    if (QMediaDevices::videoInputs().count() <= 0) {
+        qDebug() << "[ERROR] no video inputs devices";
+        return ;
+    }
+
+    const QList<QCameraDevice> cameras  = QMediaDevices::videoInputs();
+
+    for (const QCameraDevice &cameraDevice : cameras) {
+        QCamera *camera = new QCamera(cameraDevice);
+        this->cameras_list->append(std::pair(cameraDevice.description(), camera));
+        this->camera_name_list->append(cameraDevice.description());
+
+        qDebug() << cameraDevice.description();
+    }
 }
 
 /* slot function */

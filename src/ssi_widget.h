@@ -11,9 +11,14 @@
 
 #include <QString>
 #include <QSettings>
+#include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
 #include <QCoreApplication>
+
+#include <QtMultimedia>
+#include <QMediaDevices>
+#include <QtMultimediaWidgets/QtMultimediaWidgets>
 
 class SSI_Widget: public QWidget {
     Q_OBJECT
@@ -25,6 +30,19 @@ private:
     
     /* 打开摄像头的按钮 */
     QPushButton     *open_camera;
+
+    /* 列出摄像头下拉列表 */
+    QComboBox       *camera_list;
+
+    /* 列出摄像头名称列表 */
+    QStringList     *camera_name_list;
+
+    /* 摄像头列表 */
+    QList<std::pair<QString, QCamera*>>    *cameras_list;
+
+private: 
+    
+    void get_camera_list();
 
 public: 
     SSI_Widget(QMainWindow *parent = nullptr);
