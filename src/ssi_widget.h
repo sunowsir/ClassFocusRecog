@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QVideoWidget>
 #include <QCoreApplication>
 
 #include <QtMultimedia>
@@ -37,14 +38,22 @@ private:
     /* 列出摄像头下拉列表 */
     QComboBox       *camera_list;
 
+    /* 摄像头组件 */
+    QVideoWidget    *camera_view;
+
 
 /* 数据 */
 
+    /* 选择的摄像头 */
+    QScopedPointer<QCamera>                 selected_camera;
+
     /* 列出摄像头名称列表 */
-    QStringList     *camera_name_list;
+    QStringList                             *camera_name_list;
 
     /* 摄像头列表 */
-    QList<std::pair<QString, QCamera*>>    *cameras_list;
+    QList<std::pair<QString, QCamera*>>     *cameras_list;
+
+    QMediaCaptureSession                    *captureSession;
 
 private: 
     
@@ -56,6 +65,7 @@ public:
 
 public slots:
     void slots_open_camera();
+    void slots_select_camera(const QString&);
 };
 
 #endif

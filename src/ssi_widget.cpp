@@ -37,11 +37,19 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->camera_list->resize(190, 30);
     this->camera_list->addItems(*this->camera_name_list);
 
+    /* camera view */
+    this->camera_view = new QVideoWidget(this);
+    this->camera_view->move(5, 5);
+    this->camera_view->resize(450, 380);
+
+    this->captureSession = new QMediaCaptureSession();
     
     /* connect signal with slot */
 
     QWidget::connect(this->open_camera, SIGNAL(released()), 
             this, SLOT(slots_open_camera()), Qt::AutoConnection);
+    QWidget::connect(this->camera_list, SIGNAL(currentTextChanged(const QString&)), 
+            this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
 }
 
 SSI_Widget::~SSI_Widget() {
@@ -58,17 +66,46 @@ void SSI_Widget::get_camera_list() {
 
     const QList<QCameraDevice> cameras  = QMediaDevices::videoInputs();
 
+    bool select_flag = false;
     for (const QCameraDevice &cameraDevice : cameras) {
         QCamera *camera = new QCamera(cameraDevice);
         this->cameras_list->append(std::pair(cameraDevice.description(), camera));
         this->camera_name_list->append(cameraDevice.description());
-
-        qDebug() << cameraDevice.description();
+        this->selected_camera.reset(camera);
+        select_flag = true;
     }
+
+    if (select_flag == false) 
+        QMessageBox::critical(this, tr("错误"), tr("无摄像头"));
+
+    return ;
 }
 
 /* slot function */
 
 void SSI_Widget::slots_open_camera() {
-    qDebug() << "click button";
+    // if (nullptr != this->selected_camera) {
+    //     QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
+    //     return ;
+    // }
+
+    this->captureSession->setCamera(this->selected_camera.data());
+    this->captureSession->setVideoOutput(this->camera_view);
+
+    this->camera_view->show();
+
+    this->selected_camera->start();
+
+    return ;
+}
+
+void SSI_Widget::slots_select_camera(const QString& selected_name) {
+    for (const std::pair<QString, QCamera*> &camera : *this->cameras_list) {
+        if (selected_name != camera.first)
+            continue;
+        this->selected_camera.reset(camera.second);
+        break;
+    }
+    
+    return ;
 }

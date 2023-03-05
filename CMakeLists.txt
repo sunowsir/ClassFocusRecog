@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 find_package(Qt6 COMPONENTS Widgets LinguistTools REQUIRED)
-find_package(Qt6 COMPONENTS Multimedia REQUIRED)
+find_package(Qt6 COMPONENTS Multimedia MultimediaWidgets REQUIRED)
 
 # OpenCV
 set(OpenCV_DIR /usr/local/lib)
@@ -40,7 +40,7 @@ include_directories(
 
 
 target_link_libraries(SSI 
-    PRIVATE Qt6::Widgets Qt6::Multimedia
+    PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets
     ${OpenCV_LIBS}
     dlib::dlib
 )
