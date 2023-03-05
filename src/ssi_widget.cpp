@@ -22,7 +22,7 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     /* open camera button */
     this->open_camera = new QPushButton(this);
     this->open_camera->setText(tr("打开摄像头"));
-    this->open_camera->move(260, 400);
+    this->open_camera->move(350, 400);
     this->open_camera->resize(80, 30);
 
     this->cameras_list = new QList<std::pair<QString, QCamera*>>;
@@ -34,7 +34,7 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     /* camera list */
     this->camera_list = new QComboBox(this);
     this->camera_list->move(50, 400);
-    this->camera_list->resize(150, 30);
+    this->camera_list->resize(190, 30);
     this->camera_list->addItems(*this->camera_name_list);
 
     
