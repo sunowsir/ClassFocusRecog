@@ -53,7 +53,14 @@ private:
     /* 摄像头列表 */
     QList<std::pair<QString, QCamera*>>     *cameras_list;
 
+    /* 连接器 */
     QMediaCaptureSession                    *captureSession;
+
+    /* 媒体采集器 */
+    QImageCapture                           *imageCapture;
+
+    /* 采集到的当前一帧画面, 该属性随刷新率变化而不断变化 */
+    QImage                                  *camera_frame;
 
 private: 
     
@@ -66,6 +73,7 @@ public:
 public slots:
     void slots_open_camera();
     void slots_select_camera(const QString&);
+    void slots_capture_camera_frame(int, const QImage&);
 };
 
 #endif

@@ -43,6 +43,8 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->camera_view->resize(450, 380);
 
     this->captureSession = new QMediaCaptureSession();
+
+    this->imageCapture = new QImageCapture();
     
     /* connect signal with slot */
 
@@ -50,6 +52,8 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
             this, SLOT(slots_open_camera()), Qt::AutoConnection);
     QWidget::connect(this->camera_list, SIGNAL(currentTextChanged(const QString&)), 
             this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
+    QWidget::connect(this->imageCapture, SIGNAL(imageCaptured(int, const QImage&)), 
+            this, SLOT(slots_capture_camera_frame(int, const QImage&)), Qt::AutoConnection);
 }
 
 SSI_Widget::~SSI_Widget() {
@@ -69,6 +73,7 @@ void SSI_Widget::get_camera_list() {
     bool select_flag = false;
     for (const QCameraDevice &cameraDevice : cameras) {
         QCamera *camera = new QCamera(cameraDevice);
+
         this->cameras_list->append(std::pair(cameraDevice.description(), camera));
         this->camera_name_list->append(cameraDevice.description());
         this->selected_camera.reset(camera);
@@ -89,12 +94,18 @@ void SSI_Widget::slots_open_camera() {
     //     return ;
     // }
 
+    QCamera *now_camera = this->selected_camera.data();
     this->captureSession->setCamera(this->selected_camera.data());
     this->captureSession->setVideoOutput(this->camera_view);
+
+    /* 用this->imageCapture 捕获帧 */
+    this->captureSession->setImageCapture(this->imageCapture);
 
     this->camera_view->show();
 
     this->selected_camera->start();
+
+    this->imageCapture->capture();
 
     return ;
 }
@@ -108,4 +119,10 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
     }
     
     return ;
+}
+
+void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
+    QLabel *label=new QLabel();
+    label->setPixmap(QPixmap::fromImage(frameImage));
+    label->show();
 }
