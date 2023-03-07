@@ -45,6 +45,8 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->captureSession = new QMediaCaptureSession();
 
     this->imageCapture = new QImageCapture();
+
+    this->sii = new SSI_Img_Idf();
     
     /* connect signal with slot */
 
@@ -123,6 +125,11 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
 
 void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     QLabel *label=new QLabel();
+
+    QImage res_img = this->sii->image_identification(frameImage);
+
     label->setPixmap(QPixmap::fromImage(frameImage));
     label->show();
+
+    return ;
 }

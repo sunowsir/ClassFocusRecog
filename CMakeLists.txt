@@ -28,6 +28,7 @@ add_executable(SSI
     src/main.cpp
     src/ssi_window.cpp
     src/ssi_widget.cpp
+    src/ssi_img_idf.cpp
     ${TS_FILES}
 )
 
