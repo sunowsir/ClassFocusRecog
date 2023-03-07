@@ -8,17 +8,38 @@
 
 #include "ssi_img_idf.h"
 
-cv::Mat SSI_Img_Idf::qimage_to_mat(const QImage& img) {
-    cv::Mat mat_img = cv::Mat(img.height(), img.width(), 
-        CV_8UC3, (void*)img.constBits(), img.bytesPerLine());
-    return mat_img;
+cv::Mat SSI_Img_Idf::qimage_2_mat(const QImage& image) {
+    cv::Mat mat;
+
+    switch (image.format()) {
+    case QImage::Format_RGB32:  //一般Qt读入彩色图后为此格式
+        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+        cv::cvtColor(mat, mat, cv::COLOR_BGRA2BGR);   //转3通道
+        break;
+    case QImage::Format_RGB888:
+        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+        cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
+        break;
+    case QImage::Format_Indexed8:
+        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+        break;
+    }
+    return mat;
 }
 
-QImage SSI_Img_Idf::mat_to_qimage(const cv::Mat& img) {
-    cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
-    QImage qimg((const unsigned char*)img.data, img.cols, img.rows, img.step, 
-        QImage::Format_RGB888);
-    return qimg;
+QImage SSI_Img_Idf::mat_2_qimage(const cv::Mat& mat) {
+    if (mat.type() == CV_8UC1 || mat.type() == CV_8U) {
+        QImage image((const uchar *)mat.data, 
+            mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
+        return image;
+    }
+
+    else if (mat.type() != CV_8UC3) 
+        qDebug() << " mat_2_qimage err, mat.type(): " << mat.type();
+
+    QImage image((const uchar *)mat.data, 
+        mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+    return image.rgbSwapped();  //r与b调换
 }
 
 bool SSI_Img_Idf::idf_core(cv::Mat& frame) {
@@ -117,7 +138,7 @@ SSI_Img_Idf::~SSI_Img_Idf() {
 }
 
 QImage SSI_Img_Idf::image_identification(const QImage& img) {
-    cv::Mat frame = this->qimage_to_mat(img);
+    cv::Mat frame = this->qimage_2_mat(img);
 
     QImage ret;
     if (this->idf_core(frame) == false) {
@@ -125,7 +146,7 @@ QImage SSI_Img_Idf::image_identification(const QImage& img) {
         return ret;
     }
 
-    ret = this->mat_to_qimage(frame);
+    ret = this->mat_2_qimage(frame);
     
     return ret;
 }

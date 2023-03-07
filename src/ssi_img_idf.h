@@ -30,14 +30,14 @@
 class SSI_Img_Idf {
 private: 
 
-
-    cv::Mat qimage_to_mat(const QImage&);
-    QImage mat_to_qimage(const cv::Mat&);
-
     bool idf_core(cv::Mat&);
     void line_one_face_detections (cv::Mat img, std::vector<dlib::full_object_detection> fs);
 
 public: 
+
+    cv::Mat qimage_2_mat(const QImage&);
+    QImage mat_2_qimage(const cv::Mat&);
+
     SSI_Img_Idf();
     ~SSI_Img_Idf();
 

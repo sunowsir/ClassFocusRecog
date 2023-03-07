@@ -128,7 +128,7 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
 
     QImage res_img = this->sii->image_identification(frameImage);
 
-    label->setPixmap(QPixmap::fromImage(frameImage));
+    label->setPixmap(QPixmap::fromImage(res_img));
     label->show();
 
     return ;
