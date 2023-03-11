@@ -11,8 +11,9 @@
 
 #include <ctime>
 #include <vector>
-#include <iostream>
 #include <string>
+#include <iostream>
+#include <filesystem>
 
 
 #include <dlib/opencv.h>
@@ -24,14 +25,21 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
 
+#include <QDir>
 #include <QImage>
 #include <QCoreApplication>
 
+namespace ns_fs = std::filesystem;
+namespace ns_CVML = cv::ml;
+
+
+#define SII_FACE_BASE       100
+#define SII_face_COMM       SII_FACE_BASE + 0
+#define SII_face_HAPPY      SII_FACE_BASE + 1
+#define SII_face_HADE       SII_FACE_BASE + 2
 
 class SSI_Img_Idf {
 private: 
-
-    cv::Mat frame;
 
     /* 人脸形状探测器 */
     dlib::shape_predictor sp;
@@ -45,17 +53,30 @@ private:
     /* 人脸特征点分布 */
     std::vector<dlib::full_object_detection> shapes;
 
-    bool idf_core();
+    /* 系数数组  */
+    std::vector<float> *kp_offset;
+
+    /* 训练得到的系数数组 */
+    float **trans_kp_arr;
+
+    /* 用于保存训练系数数组的行数 */
+    unsigned int type_num;
+
+    /* 用于保存训练系数数组的列数 */
+    unsigned int img_num;
+
+private: 
+
+    bool idf_core(cv::Mat &);
 
     /* 框出每个脸，标出每个脸中的68个特征点 */
-    void point_face_detections ();
+    bool point_face_detections (cv::Mat&);
 
     /* 采集并保存特征点 */
-    void capture_and_save_keypoint();
+    bool capture_and_save_keypoint(float* = nullptr);
 
     /* 写入特征点到文件 */
-    void write_keypoint_2_file(std::string&, std::string&, bool);
-
+    bool write_keypoint_2_file(std::string&, std::string&, bool);
 
 public: 
 
@@ -65,7 +86,15 @@ public:
     SSI_Img_Idf();
     ~SSI_Img_Idf();
 
+    /* 图像识别api */
     QImage image_identification(const QImage& img);
+
+    /* 初始化保存训练得到的系数的数组 */
+    bool train_arr_set(int /* type num */, int /* img num */);
+
+    /* 训练模型，生成xml */
+    bool train_module(const QString& /* image path */, 
+        const int& /* 类别名称 */);
 };
 
 #endif

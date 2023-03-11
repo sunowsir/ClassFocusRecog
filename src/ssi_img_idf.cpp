@@ -42,11 +42,11 @@ QImage SSI_Img_Idf::mat_2_qimage(const cv::Mat& mat) {
     return image.rgbSwapped();  //r与b调换
 }
 
-bool SSI_Img_Idf::idf_core() {
+bool SSI_Img_Idf::idf_core(cv::Mat &frame) {
     cv::Mat dst;
     
     //提取灰度图
-    cv::cvtColor(this->frame, dst, CV_BGR2GRAY);
+    cv::cvtColor(frame, dst, CV_BGR2GRAY);
 
     //加载dlib的人脸识别器
     dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
@@ -75,13 +75,10 @@ bool SSI_Img_Idf::idf_core() {
         return false;
     }
 
-    this->point_face_detections();
-    this->capture_and_save_keypoint();
-
     return true;
 }
 
-void SSI_Img_Idf::point_face_detections () {
+bool SSI_Img_Idf::point_face_detections (cv::Mat &frame) {
     //指出每个检测到的人脸的位置
     for (int i = 0; i < this->dets.size(); i++) {
         //画出人脸所在区域
@@ -90,7 +87,7 @@ void SSI_Img_Idf::point_face_detections () {
         r.y = this->dets[i].top();
         r.width = this->dets[i].width();
         r.height = this->dets[i].height();
-        cv::rectangle(this->frame, r, cv::Scalar(0, 0, 255), 1, 1, 0); 
+        cv::rectangle(frame, r, cv::Scalar(0, 0, 255), 1, 1, 0); 
     }
 
     for (int j = 0; j < this->shapes.size(); j++) {
@@ -125,7 +122,7 @@ void SSI_Img_Idf::point_face_detections () {
             p1.x = this->shapes[j].part(i).x();
             p1.y = this->shapes[j].part(i).y();
 
-            cv::circle(this->frame, p1, 2, cv::Scalar(0, 0, 255), -1);
+            cv::circle(frame, p1, 2, cv::Scalar(0, 0, 255), -1);
 
 
             // p1.x = fs[j].part(i).x();
@@ -135,60 +132,157 @@ void SSI_Img_Idf::point_face_detections () {
             // cv::line(img, p1, p2, cv::Scalar(0,0,255), 2, 4, 0);
         }
     }
+
+    return true;
 }
 
-void SSI_Img_Idf::capture_and_save_keypoint() {
+bool SSI_Img_Idf::capture_and_save_keypoint(float *kp_offset_arr) {
     /* 系数 */
     float offset = -(this->dets[0].top() - this->dets[0].bottom());
 
+    int kp_offset_arr_num = 0;
     for (int i = 0; i < this->dets.size(); i++) {
         for (int j = 0; j < 68; j++) {
-            std::string file_name = std::to_string(i + 1) + std::string(".txt");
+            std::string f_name = std::string(QCoreApplication::applicationDirPath().toStdString() + 
+                std::string("/") + std::to_string(i + 1) + std::string(".txt"));
 
-            std::string context = std::to_string(this->shapes[0].part(j).x() - this->dets[0].left()  / offset);
-            this->write_keypoint_2_file(file_name, context, 0);
+            float kp_offset = this->shapes[0].part(j).x() - this->dets[0].left()  / offset;
+            std::string context = std::to_string(kp_offset);
+            this->write_keypoint_2_file(f_name, context, 0);
+            this->kp_offset->push_back(kp_offset);
+            if (nullptr != kp_offset_arr)
+                kp_offset_arr[kp_offset_arr_num++] = kp_offset;
 
-            context = std::to_string(this->shapes[0].part(j).y() - this->dets[0].left()  / offset);
-            this->write_keypoint_2_file(file_name, context, 0);
+            kp_offset = this->shapes[0].part(j).y() - this->dets[0].left()  / offset;
+            context = std::to_string(kp_offset);
+            this->write_keypoint_2_file(f_name, context, 0);
+            this->kp_offset->push_back(kp_offset);
+            if (nullptr != kp_offset_arr)
+                kp_offset_arr[kp_offset_arr_num++] = kp_offset;
         }
     }
 
-    return ;
+    return true;
 }
 
-void SSI_Img_Idf::write_keypoint_2_file(std::string& name, 
+bool SSI_Img_Idf::write_keypoint_2_file(std::string& name, 
     std::string& context, bool is_overlay) {
     std::ofstream write_fs(name, ((is_overlay) ? (std::ios::trunc) : (std::ios::app)));
 
     if (!write_fs.is_open()) {
         qDebug() << "write_fs no open";
-        return ;
+        return false;
     }
 
     write_fs << context << std::endl;
     write_fs.close();
     
-    return ;
+    return true;
 }
 
 SSI_Img_Idf::SSI_Img_Idf() {
-    
+    this->kp_offset = new std::vector<float>();
+    this->kp_offset = nullptr;
 }
 
 SSI_Img_Idf::~SSI_Img_Idf() {
-    
+    delete this->kp_offset;
 }
 
 QImage SSI_Img_Idf::image_identification(const QImage& img) {
-    this->frame = this->qimage_2_mat(img);
+    cv::Mat frame = this->qimage_2_mat(img);
 
     QImage ret;
-    if (this->idf_core() == false) {
+    if (this->idf_core(frame) == false) {
         qDebug() << "image_identification false";
         return ret;
     }
 
+    this->point_face_detections(frame);
+    this->capture_and_save_keypoint();
+
     ret = this->mat_2_qimage(frame);
     
     return ret;
+}
+
+/* 初始化保存训练得到的系数的数组 */
+bool SSI_Img_Idf::train_arr_set(int tnum, int inum) {
+    if (tnum <= 0) {
+        qDebug() << "type_num <= 0";
+        return false;
+    }
+    if (inum <= 0) {
+        qDebug() << "img_num <= 0";
+        return false;
+    }
+
+    this->type_num = tnum;
+    this->img_num = inum;
+
+    int row = (this->type_num * this->img_num);
+    this->trans_kp_arr = (float **)malloc(sizeof(float*) * row);
+    for (int i = 0; i < type_num; i++) {
+        this->trans_kp_arr[i] = (float*)malloc(sizeof(float) * (68 * 2));
+    }
+    
+    return true;
+}
+
+bool SSI_Img_Idf::train_module(const QString& img_path, 
+    const int& face_type) {
+    if (face_type < SII_FACE_BASE) {
+        qDebug() << "face_type < SII_FACE_BASE";
+        return false;
+    }
+
+    std::string xml_fname = std::string(QCoreApplication::applicationDirPath().toStdString() + 
+        std::string("/") + std::to_string(face_type) + std::string(".xml"));
+
+    this->train_arr_set(3, 50);
+
+    int img_idx = 0;
+    // 遍历目录中的所有文件 (from ChatGPT)
+    for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
+        // 检查文件是否为图像
+        if (entry.path().extension() == ".jpg" || 
+            entry.path().extension() == ".png") {
+            // 将图像文件读入 Mat 对象
+            cv::Mat frame = cv::imread(entry.path().string());
+
+            // 在此处对图像进行处理
+            if (this->idf_core(frame) == false) {
+                qDebug() << "image_identification false";
+                continue;
+            }
+
+            this->capture_and_save_keypoint(this->trans_kp_arr[img_idx++]);
+
+            // 显示图像
+            // cv::imshow("Image", image);
+            // cv::waitKey(0);
+        }
+    }
+
+    int row = (this->type_num * this->img_num);
+    int face_label[row];
+
+    memset(face_label, 0, sizeof(int) * (row));
+    for (int i = 0; i < this->img_num; i++) {
+        face_label[i + (face_type - SII_FACE_BASE)] = face_type;
+    }
+
+    cv::Mat train_mat(row, (2 * 68), CV_32FC1, this->trans_kp_arr);
+    cv::Mat label_mat(row, 1, CV_32SC1, face_label);
+
+    cv::Ptr<ns_CVML::SVM> svm = ns_CVML::SVM::create();
+    svm->setType(ns_CVML::SVM::C_SVC);
+    svm->setKernel(ns_CVML::SVM::LINEAR);
+    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 100, 1E-6));
+
+    svm->train(train_mat, ns_CVML::ROW_SAMPLE, label_mat);
+    svm->save(xml_fname);
+    
+    
+    return true;
 }
