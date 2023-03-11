@@ -30,8 +30,23 @@
 class SSI_Img_Idf {
 private: 
 
-    bool idf_core(cv::Mat&);
-    void line_one_face_detections (cv::Mat img, std::vector<dlib::full_object_detection> fs);
+    cv::Mat frame;
+
+    /* 人脸形状探测器 */
+    dlib::shape_predictor sp;
+
+    /* dlib的matrix */
+    dlib::array2d<dlib::bgr_pixel> dimg;
+
+    /* 一系列人脸所在区域 */
+    std::vector<dlib::rectangle> dets;
+
+    /* 人脸特征点分布 */
+    std::vector<dlib::full_object_detection> shapes;
+
+    bool idf_core();
+    void point_face_detections ();
+    void capture_and_save_keypoint();
 
 public: 
 
