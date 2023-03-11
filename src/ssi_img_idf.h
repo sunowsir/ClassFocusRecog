@@ -12,6 +12,7 @@
 #include <ctime>
 #include <vector>
 #include <iostream>
+#include <string>
 
 
 #include <dlib/opencv.h>
@@ -45,8 +46,16 @@ private:
     std::vector<dlib::full_object_detection> shapes;
 
     bool idf_core();
+
+    /* 框出每个脸，标出每个脸中的68个特征点 */
     void point_face_detections ();
+
+    /* 采集并保存特征点 */
     void capture_and_save_keypoint();
+
+    /* 写入特征点到文件 */
+    void write_keypoint_2_file(std::string&, std::string&, bool);
+
 
 public: 
 

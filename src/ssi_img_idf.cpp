@@ -76,12 +76,12 @@ bool SSI_Img_Idf::idf_core() {
     }
 
     this->point_face_detections();
+    this->capture_and_save_keypoint();
 
     return true;
 }
 
 void SSI_Img_Idf::point_face_detections () {
-
     //指出每个检测到的人脸的位置
     for (int i = 0; i < this->dets.size(); i++) {
         //画出人脸所在区域
@@ -138,7 +138,37 @@ void SSI_Img_Idf::point_face_detections () {
 }
 
 void SSI_Img_Idf::capture_and_save_keypoint() {
+    /* 系数 */
+    float offset = -(this->dets[0].top() - this->dets[0].bottom());
+
+    for (int i = 0; i < this->dets.size(); i++) {
+        for (int j = 0; j < 68; j++) {
+            std::string file_name = std::to_string(i + 1) + std::string(".txt");
+
+            std::string context = std::to_string(this->shapes[0].part(j).x() - this->dets[0].left()  / offset);
+            this->write_keypoint_2_file(file_name, context, 0);
+
+            context = std::to_string(this->shapes[0].part(j).y() - this->dets[0].left()  / offset);
+            this->write_keypoint_2_file(file_name, context, 0);
+        }
+    }
+
+    return ;
+}
+
+void SSI_Img_Idf::write_keypoint_2_file(std::string& name, 
+    std::string& context, bool is_overlay) {
+    std::ofstream write_fs(name, ((is_overlay) ? (std::ios::trunc) : (std::ios::app)));
+
+    if (!write_fs.is_open()) {
+        qDebug() << "write_fs no open";
+        return ;
+    }
+
+    write_fs << context << std::endl;
+    write_fs.close();
     
+    return ;
 }
 
 SSI_Img_Idf::SSI_Img_Idf() {
