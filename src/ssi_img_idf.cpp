@@ -143,20 +143,20 @@ bool SSI_Img_Idf::capture_and_save_keypoint(float *kp_offset_arr) {
     int kp_offset_arr_num = 0;
     for (int i = 0; i < this->dets.size(); i++) {
         for (int j = 0; j < 68; j++) {
-            std::string f_name = std::string(QCoreApplication::applicationDirPath().toStdString() + 
-                std::string("/") + std::to_string(i + 1) + std::string(".txt"));
+            // std::string f_name = std::string(QCoreApplication::applicationDirPath().toStdString() + 
+            //     std::string("/") + std::to_string(i + 1) + std::string(".txt"));
 
             float kp_offset = this->shapes[0].part(j).x() - this->dets[0].left()  / offset;
-            std::string context = std::to_string(kp_offset);
-            this->write_keypoint_2_file(f_name, context, 0);
-            this->kp_offset->push_back(kp_offset);
+            // std::string context = std::to_string(kp_offset);
+            // this->write_keypoint_2_file(f_name, context, 0);
+            this->kp_offsets->push_back(kp_offset);
             if (nullptr != kp_offset_arr)
                 kp_offset_arr[kp_offset_arr_num++] = kp_offset;
 
             kp_offset = this->shapes[0].part(j).y() - this->dets[0].left()  / offset;
-            context = std::to_string(kp_offset);
-            this->write_keypoint_2_file(f_name, context, 0);
-            this->kp_offset->push_back(kp_offset);
+            // context = std::to_string(kp_offset);
+            // this->write_keypoint_2_file(f_name, context, 0);
+            this->kp_offsets->push_back(kp_offset);
             if (nullptr != kp_offset_arr)
                 kp_offset_arr[kp_offset_arr_num++] = kp_offset;
         }
@@ -181,12 +181,13 @@ bool SSI_Img_Idf::write_keypoint_2_file(std::string& name,
 }
 
 SSI_Img_Idf::SSI_Img_Idf() {
-    this->kp_offset = new std::vector<float>();
-    this->kp_offset = nullptr;
+    this->kp_offsets = new std::vector<float>();
+    this->trans_kp_arr = nullptr;
+    this->face_label = nullptr;
 }
 
 SSI_Img_Idf::~SSI_Img_Idf() {
-    delete this->kp_offset;
+    delete this->kp_offsets;
 }
 
 QImage SSI_Img_Idf::image_identification(const QImage& img) {
@@ -221,37 +222,50 @@ bool SSI_Img_Idf::train_arr_set(int tnum, int inum) {
     this->img_num = inum;
 
     int row = (this->type_num * this->img_num);
+
     this->trans_kp_arr = (float **)malloc(sizeof(float*) * row);
-    for (int i = 0; i < type_num; i++) {
+    for (int i = 0; i < row; i++) {
         this->trans_kp_arr[i] = (float*)malloc(sizeof(float) * (68 * 2));
+        memset(this->trans_kp_arr[i], 0, sizeof(float) * (68 * 2));
     }
+
+    this->face_label = (int*)malloc(sizeof(int) * row);
+    memset(this->face_label, 0, sizeof(int) * row);
     
     return true;
 }
 
-bool SSI_Img_Idf::train_module(const QString& img_path, 
+bool SSI_Img_Idf::load_train_data(const QString& img_path, 
     const int& face_type) {
     if (face_type < SII_FACE_BASE) {
         qDebug() << "face_type < SII_FACE_BASE";
         return false;
     }
+    if (QString("") == img_path) {
+        qDebug() << "img_path is null";
+        return false;
+    }
 
-    std::string xml_fname = std::string(QCoreApplication::applicationDirPath().toStdString() + 
-        std::string("/") + std::to_string(face_type) + std::string(".xml"));
+    int row = (this->type_num * this->img_num);
 
-    this->train_arr_set(3, 50);
+    for (int i = 0; i < this->img_num; i++) {
+        this->face_label[i + ((face_type - SII_FACE_BASE) * this->img_num)] = face_type;
+    }
 
-    int img_idx = 0;
+    int img_idx = (face_type - SII_FACE_BASE) * 50;
     // 遍历目录中的所有文件 (from ChatGPT)
     for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
         // 检查文件是否为图像
         if (entry.path().extension() == ".jpg" || 
             entry.path().extension() == ".png") {
+
+            std::cout << entry.path().string() << std::endl;
+
             // 将图像文件读入 Mat 对象
             cv::Mat frame = cv::imread(entry.path().string());
 
             // 在此处对图像进行处理
-            if (this->idf_core(frame) == false) {
+            if (false == this->idf_core(frame)) {
                 qDebug() << "image_identification false";
                 continue;
             }
@@ -263,17 +277,15 @@ bool SSI_Img_Idf::train_module(const QString& img_path,
             // cv::waitKey(0);
         }
     }
+    
+    return true;
+}
 
+bool SSI_Img_Idf::train_module_2_xml() {
     int row = (this->type_num * this->img_num);
-    int face_label[row];
-
-    memset(face_label, 0, sizeof(int) * (row));
-    for (int i = 0; i < this->img_num; i++) {
-        face_label[i + (face_type - SII_FACE_BASE)] = face_type;
-    }
 
     cv::Mat train_mat(row, (2 * 68), CV_32FC1, this->trans_kp_arr);
-    cv::Mat label_mat(row, 1, CV_32SC1, face_label);
+    cv::Mat label_mat(row, 1, CV_32SC1, this->face_label);
 
     cv::Ptr<ns_CVML::SVM> svm = ns_CVML::SVM::create();
     svm->setType(ns_CVML::SVM::C_SVC);
@@ -281,8 +293,12 @@ bool SSI_Img_Idf::train_module(const QString& img_path,
     svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 100, 1E-6));
 
     svm->train(train_mat, ns_CVML::ROW_SAMPLE, label_mat);
+
+    std::string xml_fname = std::string(QCoreApplication::applicationDirPath().toStdString() + 
+        std::string("/SVM_DATA.xml"));
     svm->save(xml_fname);
-    
-    
+
+    qDebug() << "over!!!";
+
     return true;
 }

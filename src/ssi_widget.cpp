@@ -124,12 +124,21 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
 }
 
 void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
-    QLabel *label=new QLabel();
+    // QLabel *label=new QLabel();
 
-    QImage res_img = this->sii->image_identification(frameImage);
+    // QImage res_img = this->sii->image_identification(frameImage);
 
-    label->setPixmap(QPixmap::fromImage(res_img));
-    label->show();
+    // label->setPixmap(QPixmap::fromImage(res_img));
+    // label->show();
+    
+    /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
+    this->sii->train_arr_set(3, 50);
+
+    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), SII_face_COMM);
+    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), SII_face_HAPPY);
+    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SII_face_HADE);
+
+    this->sii->train_module_2_xml();
 
     return ;
 }

@@ -54,10 +54,13 @@ private:
     std::vector<dlib::full_object_detection> shapes;
 
     /* 系数数组  */
-    std::vector<float> *kp_offset;
+    std::vector<float> *kp_offsets;
 
     /* 训练得到的系数数组 */
     float **trans_kp_arr;
+
+    /* 表情标签数组 */
+    int *face_label;
 
     /* 用于保存训练系数数组的行数 */
     unsigned int type_num;
@@ -92,9 +95,12 @@ public:
     /* 初始化保存训练得到的系数的数组 */
     bool train_arr_set(int /* type num */, int /* img num */);
 
-    /* 训练模型，生成xml */
-    bool train_module(const QString& /* image path */, 
+    /* 载入训练图片，以及该组图片对应的表情 */
+    bool load_train_data(const QString& /* image path */, 
         const int& /* 类别名称 */);
+
+    /* 训练模型，并导出为xml模型文件 */
+    bool train_module_2_xml();
 };
 
 #endif
