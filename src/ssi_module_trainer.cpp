@@ -1,14 +1,14 @@
 /*
-	* File     : ssi_img_idf.cpp
+	* File     : ssi_module_trainer.cpp
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月07日 星期二 19时44分57秒
 */
 
-#include "ssi_img_idf.h"
+#include "ssi_module_trainer.h"
 
-cv::Mat SSI_Img_Idf::qimage_2_mat(const QImage& image) {
+cv::Mat SSI_Module_Trainer::qimage_2_mat(const QImage& image) {
     cv::Mat mat;
 
     switch (image.format()) {
@@ -27,7 +27,7 @@ cv::Mat SSI_Img_Idf::qimage_2_mat(const QImage& image) {
     return mat;
 }
 
-QImage SSI_Img_Idf::mat_2_qimage(const cv::Mat& mat) {
+QImage SSI_Module_Trainer::mat_2_qimage(const cv::Mat& mat) {
     if (mat.type() == CV_8UC1 || mat.type() == CV_8U) {
         QImage image((const uchar *)mat.data, 
             mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
@@ -42,7 +42,7 @@ QImage SSI_Img_Idf::mat_2_qimage(const cv::Mat& mat) {
     return image.rgbSwapped();  //r与b调换
 }
 
-bool SSI_Img_Idf::idf_core(cv::Mat &frame) {
+bool SSI_Module_Trainer::idf_core(cv::Mat &frame) {
     cv::Mat dst;
     
     //提取灰度图
@@ -78,7 +78,7 @@ bool SSI_Img_Idf::idf_core(cv::Mat &frame) {
     return true;
 }
 
-bool SSI_Img_Idf::point_face_detections (cv::Mat &frame) {
+bool SSI_Module_Trainer::point_face_detections (cv::Mat &frame) {
     //指出每个检测到的人脸的位置
     for (int i = 0; i < this->dets.size(); i++) {
         //画出人脸所在区域
@@ -136,61 +136,73 @@ bool SSI_Img_Idf::point_face_detections (cv::Mat &frame) {
     return true;
 }
 
-bool SSI_Img_Idf::capture_and_save_keypoint(float *kp_offset_arr) {
+bool SSI_Module_Trainer::capture_and_save_keypoint(float *kp_offset_arr) {
     /* 系数 */
     float offset = -(this->dets[0].top() - this->dets[0].bottom());
 
     int kp_offset_arr_num = 0;
-    for (int i = 0; i < this->dets.size(); i++) {
-        for (int j = 0; j < 68; j++) {
-            // std::string f_name = std::string(QCoreApplication::applicationDirPath().toStdString() + 
-            //     std::string("/") + std::to_string(i + 1) + std::string(".txt"));
+    for (int j = 0; j < 68; j++) {
 
-            float kp_offset = this->shapes[0].part(j).x() - this->dets[0].left()  / offset;
-            // std::string context = std::to_string(kp_offset);
-            // this->write_keypoint_2_file(f_name, context, 0);
-            this->kp_offsets->push_back(kp_offset);
-            if (nullptr != kp_offset_arr)
-                kp_offset_arr[kp_offset_arr_num++] = kp_offset;
+        float kp_offset = this->shapes[0].part(j).x() - this->dets[0].left()  / offset;
+        this->kp_offsets->push_back(kp_offset);
+        if (nullptr != kp_offset_arr)
+            kp_offset_arr[kp_offset_arr_num++] = kp_offset;
 
-            kp_offset = this->shapes[0].part(j).y() - this->dets[0].left()  / offset;
-            // context = std::to_string(kp_offset);
-            // this->write_keypoint_2_file(f_name, context, 0);
-            this->kp_offsets->push_back(kp_offset);
-            if (nullptr != kp_offset_arr)
-                kp_offset_arr[kp_offset_arr_num++] = kp_offset;
-        }
+        kp_offset = this->shapes[0].part(j).y() - this->dets[0].left()  / offset;
+        this->kp_offsets->push_back(kp_offset);
+        if (nullptr != kp_offset_arr)
+            kp_offset_arr[kp_offset_arr_num++] = kp_offset;
     }
 
     return true;
 }
 
-bool SSI_Img_Idf::write_keypoint_2_file(std::string& name, 
-    std::string& context, bool is_overlay) {
-    std::ofstream write_fs(name, ((is_overlay) ? (std::ios::trunc) : (std::ios::app)));
-
-    if (!write_fs.is_open()) {
-        qDebug() << "write_fs no open";
-        return false;
-    }
-
-    write_fs << context << std::endl;
-    write_fs.close();
-    
-    return true;
-}
-
-SSI_Img_Idf::SSI_Img_Idf() {
+SSI_Module_Trainer::SSI_Module_Trainer(int tnum, int inum) {
     this->kp_offsets = new std::vector<float>();
-    this->trans_kp_arr = nullptr;
-    this->face_label = nullptr;
+
+    if (tnum <= 0) {
+        qDebug() << "type_num <= 0";
+        return ;
+    }
+    if (inum <= 0) {
+        qDebug() << "img_num <= 0";
+        return ;
+    }
+
+    this->type_num = tnum;
+    this->img_num = inum;
+
+    int row = (this->type_num * this->img_num);
+
+    this->trans_kp_arr = (float **)malloc(sizeof(float*) * row);
+    for (int i = 0; i < row; i++) {
+        this->trans_kp_arr[i] = (float*)malloc(sizeof(float) * (68 * 2));
+        memset(this->trans_kp_arr[i], 0, sizeof(float) * (68 * 2));
+    }
+
+    this->face_label = (int*)malloc(sizeof(int) * row);
+    memset(this->face_label, 0, sizeof(int) * row);
+
+    return ;
 }
 
-SSI_Img_Idf::~SSI_Img_Idf() {
+SSI_Module_Trainer::~SSI_Module_Trainer() {
     delete this->kp_offsets;
+
+    int row = (this->type_num * this->img_num);
+    for (int i = 0; i < row; i++) {
+        free(this->trans_kp_arr[i]);
+        this->trans_kp_arr[i] = nullptr;
+    }
+    free(this->trans_kp_arr);
+    this->trans_kp_arr = nullptr;
+
+    free(this->face_label);
+
+    return ;
 }
 
-QImage SSI_Img_Idf::image_identification(const QImage& img) {
+QImage SSI_Module_Trainer::image_identification(const QImage& img) {
     cv::Mat frame = this->qimage_2_mat(img);
 
     QImage ret;
@@ -207,38 +219,10 @@ QImage SSI_Img_Idf::image_identification(const QImage& img) {
     return ret;
 }
 
-/* 初始化保存训练得到的系数的数组 */
-bool SSI_Img_Idf::train_arr_set(int tnum, int inum) {
-    if (tnum <= 0) {
-        qDebug() << "type_num <= 0";
-        return false;
-    }
-    if (inum <= 0) {
-        qDebug() << "img_num <= 0";
-        return false;
-    }
-
-    this->type_num = tnum;
-    this->img_num = inum;
-
-    int row = (this->type_num * this->img_num);
-
-    this->trans_kp_arr = (float **)malloc(sizeof(float*) * row);
-    for (int i = 0; i < row; i++) {
-        this->trans_kp_arr[i] = (float*)malloc(sizeof(float) * (68 * 2));
-        memset(this->trans_kp_arr[i], 0, sizeof(float) * (68 * 2));
-    }
-
-    this->face_label = (int*)malloc(sizeof(int) * row);
-    memset(this->face_label, 0, sizeof(int) * row);
-    
-    return true;
-}
-
-bool SSI_Img_Idf::load_train_data(const QString& img_path, 
+bool SSI_Module_Trainer::load_train_data(const QString& img_path, 
     const int& face_type) {
-    if (face_type < SII_FACE_BASE) {
-        qDebug() << "face_type < SII_FACE_BASE";
+    if (face_type < SSI_FACE_BASE) {
+        qDebug() << "face_type < SSI_FACE_BASE";
         return false;
     }
     if (QString("") == img_path) {
@@ -249,39 +233,38 @@ bool SSI_Img_Idf::load_train_data(const QString& img_path,
     int row = (this->type_num * this->img_num);
 
     for (int i = 0; i < this->img_num; i++) {
-        this->face_label[i + ((face_type - SII_FACE_BASE) * this->img_num)] = face_type;
+        this->face_label[i + ((face_type - SSI_FACE_BASE) * this->img_num)] = face_type;
     }
 
-    int img_idx = (face_type - SII_FACE_BASE) * 50;
-    // 遍历目录中的所有文件 (from ChatGPT)
+    int img_idx = (face_type - SSI_FACE_BASE) * this->img_num;
+    /* 遍历目录中的所有文件 (code from ChatGPT) */
     for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
-        // 检查文件是否为图像
+        if (img_idx - (face_type - SSI_FACE_BASE) * this->img_num >= this->img_num)
+            break;
+
+        /* 检查文件是否为图像 */
         if (entry.path().extension() == ".jpg" || 
             entry.path().extension() == ".png") {
 
             std::cout << entry.path().string() << std::endl;
 
-            // 将图像文件读入 Mat 对象
+            /* 将图像文件读入 Mat 对象 */
             cv::Mat frame = cv::imread(entry.path().string());
 
-            // 在此处对图像进行处理
+            /* 在此处对图像进行处理 */
             if (false == this->idf_core(frame)) {
                 qDebug() << "image_identification false";
                 continue;
             }
 
             this->capture_and_save_keypoint(this->trans_kp_arr[img_idx++]);
-
-            // 显示图像
-            // cv::imshow("Image", image);
-            // cv::waitKey(0);
         }
     }
     
     return true;
 }
 
-bool SSI_Img_Idf::train_module_2_xml() {
+bool SSI_Module_Trainer::train_module_2_xml() {
     int row = (this->type_num * this->img_num);
 
     cv::Mat train_mat(row, (2 * 68), CV_32FC1, this->trans_kp_arr);

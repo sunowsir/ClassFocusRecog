@@ -45,8 +45,6 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->captureSession = new QMediaCaptureSession();
 
     this->imageCapture = new QImageCapture();
-
-    this->sii = new SSI_Img_Idf();
     
     /* connect signal with slot */
 
@@ -126,19 +124,21 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
 void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     // QLabel *label=new QLabel();
 
-    // QImage res_img = this->sii->image_identification(frameImage);
+    // QImage res_img = this->smt->image_identification(frameImage);
 
     // label->setPixmap(QPixmap::fromImage(res_img));
     // label->show();
     
+    /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
-    this->sii->train_arr_set(3, 50);
+    SSI_Module_Trainer smt(3, 50);
+    
 
-    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), SII_face_COMM);
-    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), SII_face_HAPPY);
-    this->sii->load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SII_face_HADE);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), SSI_face_COMM);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), SSI_face_HAPPY);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
 
-    this->sii->train_module_2_xml();
+    smt.train_module_2_xml();
 
     return ;
 }

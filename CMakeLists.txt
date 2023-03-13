@@ -28,7 +28,9 @@ add_executable(SSI
     src/main.cpp
     src/ssi_window.cpp
     src/ssi_widget.cpp
-    src/ssi_img_idf.cpp
+    src/ssi_module_trainer.cpp
+    src/ssi_face_recognition.cpp
+    src/ssi_image_converter.cpp
     ${TS_FILES}
 )
 

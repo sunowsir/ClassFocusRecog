@@ -22,7 +22,7 @@
 #include <QMediaDevices>
 #include <QtMultimediaWidgets/QtMultimediaWidgets>
 
-#include "ssi_img_idf.h"
+#include "ssi_module_trainer.h"
 
 class SSI_Widget: public QWidget {
     Q_OBJECT
@@ -60,9 +60,6 @@ private:
 
     /* 媒体采集器 */
     QImageCapture                           *imageCapture;
-
-    /* 图像识别器 */
-    SSI_Img_Idf                             *sii;
 
     /* 采集到的当前一帧画面, 该属性随刷新率变化而不断变化 */
     QImage                                  *camera_frame;
