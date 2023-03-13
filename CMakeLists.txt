@@ -31,6 +31,7 @@ add_executable(SSI
     src/ssi_module_trainer.cpp
     src/ssi_face_recognition.cpp
     src/ssi_image_converter.cpp
+    src/ssi_expression_recognition.h
     ${TS_FILES}
 )
 
