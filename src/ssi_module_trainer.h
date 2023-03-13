@@ -38,6 +38,7 @@ namespace ns_CVML = cv::ml;
 #define SSI_face_HAPPY      SSI_FACE_BASE + 1
 #define SSI_face_HADE       SSI_FACE_BASE + 2
 
+/* 模型训练器 */
 class SSI_Module_Trainer {
 private: 
 

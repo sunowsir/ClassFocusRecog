@@ -17,6 +17,7 @@
 #include <QImage>
 #include <QCoreApplication>
 
+/* 图片转换器 */
 class SSI_Image_Converter {
 private: 
     

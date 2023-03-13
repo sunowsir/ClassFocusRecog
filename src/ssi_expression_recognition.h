@@ -9,6 +9,7 @@
 #ifndef _SSI_EXPRESSION_RECOGNITION_H
 #define _SSI_EXPRESSION_RECOGNITION_H
 
+/* 表情识别器 */
 class SSI_Expression_Recognition {
 private: 
 
