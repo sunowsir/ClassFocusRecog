@@ -29,14 +29,12 @@
 #include <QImage>
 #include <QCoreApplication>
 
+#include "ssi_face_recognition.h"
+#include "ssi_expression_recognition.h"
+
 namespace ns_fs = std::filesystem;
 namespace ns_CVML = cv::ml;
 
-
-#define SSI_FACE_BASE       100
-#define SSI_face_COMM       SSI_FACE_BASE + 0
-#define SSI_face_HAPPY      SSI_FACE_BASE + 1
-#define SSI_face_HADE       SSI_FACE_BASE + 2
 
 /* 模型训练器 */
 class SSI_Module_Trainer {
@@ -47,15 +45,6 @@ private:
 
     /* dlib的matrix */
     dlib::array2d<dlib::bgr_pixel> dimg;
-
-    /* 一系列人脸所在区域 */
-    std::vector<dlib::rectangle> dets;
-
-    /* 人脸特征点分布 */
-    std::vector<dlib::full_object_detection> shapes;
-
-    /* 系数数组  */
-    std::vector<float> *kp_offsets;
 
     /* 训练得到的系数数组 */
     float **trans_kp_arr;
@@ -70,26 +59,13 @@ private:
     unsigned int img_num;
 
 private: 
-
-    /* 图片识别核心代码，将图片解析为特征点数据 this->sharps */
-    bool idf_core(cv::Mat &);
-
-    /* 框出每个脸，标出每个脸中的68个特征点 */
-    bool point_face_detections (cv::Mat&);
-
     /* 采集并保存特征点 */
-    bool capture_and_save_keypoint(float* = nullptr);
+    bool capture_and_save_keypoint(cv::Mat&, float* = nullptr);
 
 public: 
 
-    cv::Mat qimage_2_mat(const QImage&);
-    QImage mat_2_qimage(const cv::Mat&);
-
     SSI_Module_Trainer(int /* type num */, int /* img num */);
     ~SSI_Module_Trainer();
-
-    /* 图像识别api */
-    QImage image_identification(const QImage& img);
 
     /* 载入训练图片，以及该组图片对应的表情 */
     bool load_train_data(const QString& /* image path */, 

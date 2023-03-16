@@ -49,3 +49,4 @@ QImage SSI_Image_Converter::mat_2_qimage(const cv::Mat& mat) {
         mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
     return image.rgbSwapped();  //r与b调换
 }
+
