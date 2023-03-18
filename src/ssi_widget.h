@@ -48,7 +48,7 @@ private:
 /* 数据 */
 
     /* 选择的摄像头 */
-    QScopedPointer<QCamera>                 selected_camera;
+    QCamera                                 *selected_camera;
 
     /* 列出摄像头名称列表 */
     QStringList                             *camera_name_list;

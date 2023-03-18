@@ -10,6 +10,8 @@
 
 SSI_Expression_Recognition::SSI_Expression_Recognition(const QString& module_filepath) {
     this->svm = ns_CVML::StatModel::load<ns_CVML::SVM>(module_filepath.toStdString());
+    this->sfr = new SSI_Face_Recognition(QCoreApplication::applicationDirPath() + 
+        QString("/shape_predictor_68_face_landmarks.dat"));
 }
 
 SSI_Expression_Recognition::~SSI_Expression_Recognition() {
@@ -19,21 +21,18 @@ SSI_Expression_Recognition::~SSI_Expression_Recognition() {
 bool SSI_Expression_Recognition::recognize(const QImage& img, int& face_type) {
     SSI_Image_Converter sic;
     cv::Mat frame = sic.qimage_2_mat(img);
-
-    /* 人脸识别器 */
-    SSI_Face_Recognition sfr(frame);
     
     /* 开始识别 */
-    if (false == sfr.recognize()) {
+    if (false == this->sfr->recognize(frame)) {
         qDebug() << "sfr.recognize failed.";
         return false;
     }
 
     /* 一系列人脸所在区域 */
-    std::vector<dlib::rectangle> &faces = sfr.faces_get();
+    std::vector<dlib::rectangle> &faces = this->sfr->faces_get();
 
     /* 人脸特征点分布 */
-    std::vector<dlib::full_object_detection> &shapes = sfr.shapes_get();
+    std::vector<dlib::full_object_detection> &shapes = this->sfr->shapes_get();
 
     /* 系数 */
     float offset = -(faces[0].top() - faces[0].bottom());

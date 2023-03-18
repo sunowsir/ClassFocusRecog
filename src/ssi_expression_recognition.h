@@ -40,6 +40,9 @@ class SSI_Expression_Recognition {
 private: 
     cv::Ptr<ns_CVML::SVM>   svm;
 
+    /* 人脸识别器 */
+    SSI_Face_Recognition    *sfr;
+
 public:
     SSI_Expression_Recognition(const QString& /* module file path */);
     ~SSI_Expression_Recognition();

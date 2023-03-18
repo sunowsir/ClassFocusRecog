@@ -58,6 +58,9 @@ private:
     /* 用于保存训练系数数组的列数 */
     unsigned int img_num;
 
+    /* 人脸识别器 */
+    SSI_Face_Recognition *sfr;
+
 private: 
     /* 采集并保存特征点 */
     bool capture_and_save_keypoint(cv::Mat&, float* = nullptr);

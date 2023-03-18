@@ -22,25 +22,28 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     /* open camera button */
     this->open_camera = new QPushButton(this);
     this->open_camera->setText(tr("打开摄像头"));
-    this->open_camera->move(350, 400);
+    this->open_camera->move(350, 520);
     this->open_camera->resize(80, 30);
 
     this->cameras_list = new QList<std::pair<QString, QCamera*>>;
     this->camera_name_list = new QStringList;
+
+    this->selected_camera = nullptr;
 
     /* 获取摄像头列表 */
     this->get_camera_list();
 
     /* camera list */
     this->camera_list = new QComboBox(this);
-    this->camera_list->move(50, 400);
+    this->camera_list->move(50, 520);
     this->camera_list->resize(190, 30);
     this->camera_list->addItems(*this->camera_name_list);
 
     /* camera view */
     this->camera_view = new QVideoWidget(this);
-    this->camera_view->move(5, 5);
-    this->camera_view->resize(450, 380);
+    this->camera_view->move(1, 1);
+    this->camera_view->resize(500, 450);
+    this->camera_view->hide();
 
     this->captureSession = new QMediaCaptureSession();
 
@@ -82,11 +85,12 @@ void SSI_Widget::get_camera_list() {
 
         this->cameras_list->append(std::pair(cameraDevice.description(), camera));
         this->camera_name_list->append(cameraDevice.description());
-        this->selected_camera.reset(camera);
+
+        this->selected_camera = camera;
         select_flag = true;
     }
 
-    if (select_flag == false) 
+    if (false == select_flag) 
         QMessageBox::critical(this, tr("错误"), tr("无摄像头"));
 
     return ;
@@ -95,20 +99,22 @@ void SSI_Widget::get_camera_list() {
 /* slot function */
 
 void SSI_Widget::slots_open_camera() {
-    // if (nullptr != this->selected_camera) {
-    //     QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
-    //     return ;
-    // }
+    if (nullptr == this->selected_camera) {
+        QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
+        return ;
+    }
 
-    QCamera *now_camera = this->selected_camera.data();
-    this->captureSession->setCamera(this->selected_camera.data());
+
+    this->captureSession->setCamera(this->selected_camera);
     this->captureSession->setVideoOutput(this->camera_view);
 
     /* 用this->imageCapture 捕获帧 */
     this->captureSession->setImageCapture(this->imageCapture);
 
+    /* 显示摄像头的实时图像 */
     this->camera_view->show();
 
+    /* 打开摄像头 */
     this->selected_camera->start();
 
     this->capture_timer->start(5 * 1000);
@@ -120,7 +126,7 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
     for (const std::pair<QString, QCamera*> &camera : *this->cameras_list) {
         if (selected_name != camera.first)
             continue;
-        this->selected_camera.reset(camera.second);
+        this->selected_camera = camera.second;
         break;
     }
     
@@ -128,13 +134,6 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
 }
 
 void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
-    // QLabel *label=new QLabel();
-
-    // QImage res_img = this->smt->image_identification(frameImage);
-
-    // label->setPixmap(QPixmap::fromImage(res_img));
-    // label->show();
-    
 #if 0
     /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */

@@ -26,25 +26,23 @@
 /* 人脸识别器 */
 class SSI_Face_Recognition {
 private: 
-    cv::Mat     *frame;
+    /* 人脸形状探测器 */
+    dlib::shape_predictor sp;
 
     /* 一系列人脸所在区域 */
     std::vector<dlib::rectangle> faces;
 
-    /* 人脸形状探测器 */
-    dlib::shape_predictor sp;
-
-    /* dlib的matrix */
-    dlib::array2d<dlib::bgr_pixel> dimg;
-
     /* 人脸特征点分布 */
     std::vector<dlib::full_object_detection> shapes;
 
+    /* 加载dlib的人脸识别器 */
+    dlib::frontal_face_detector detector;
+
 public: 
-    SSI_Face_Recognition(cv::Mat&);
+    SSI_Face_Recognition(const QString&);
     ~SSI_Face_Recognition();
 
-    bool recognize();
+    bool recognize(cv::Mat&);
     std::vector<dlib::rectangle>& faces_get();
     std::vector<dlib::full_object_detection>& shapes_get();
 };
