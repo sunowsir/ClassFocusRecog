@@ -45,6 +45,10 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->captureSession = new QMediaCaptureSession();
 
     this->imageCapture = new QImageCapture();
+
+    this->capture_timer = new QTimer(this);
+
+    this->ser = new SSI_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
     
     /* connect signal with slot */
 
@@ -54,6 +58,8 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
             this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
     QWidget::connect(this->imageCapture, SIGNAL(imageCaptured(int, const QImage&)), 
             this, SLOT(slots_capture_camera_frame(int, const QImage&)), Qt::AutoConnection);
+    QWidget::connect(this->capture_timer, SIGNAL(timeout()), 
+            this, SLOT(slots_timer_out()), Qt::AutoConnection);
 }
 
 SSI_Widget::~SSI_Widget() {
@@ -105,7 +111,7 @@ void SSI_Widget::slots_open_camera() {
 
     this->selected_camera->start();
 
-    this->imageCapture->capture();
+    this->capture_timer->start(5 * 1000);
 
     return ;
 }
@@ -129,6 +135,7 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     // label->setPixmap(QPixmap::fromImage(res_img));
     // label->show();
     
+#if 0
     /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
     SSI_Module_Trainer smt(3, 50);
@@ -139,6 +146,34 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
 
     smt.train_module_2_xml();
+#endif
+
+
+    qDebug() << "开始识别";
+    int face_type = 0;
+    this->ser->recognize(frameImage, face_type);
+    qDebug() << "识别结束";
+
+    qDebug() << face_type;
+
+    switch(face_type) {
+        case SSI_face_COMM: {
+            qDebug() << "平静";
+        } break;
+        case SSI_face_HAPPY: {
+            qDebug() << "开心";
+        } break;
+        case SSI_face_HADE: {
+            qDebug() << "厌恶";
+        } break;
+        default: {
+            qDebug() << "unknow";
+        }
+    }
 
     return ;
+}
+
+void SSI_Widget::slots_timer_out() {
+    this->imageCapture->capture();
 }
