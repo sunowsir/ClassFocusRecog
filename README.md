@@ -29,7 +29,7 @@
 
 ### 人脸识别器
 
-1. 类声明如下：
+1. 类声明如下
 
 人脸识别器用于初步处理图像，并获取到人脸特征点，该类是表情识别的最基础的必须的类
 ```c++
@@ -58,7 +58,7 @@ public:
 };
 ```
 
-1. 对外接口详解：
+1. 对外接口详解
 
     1. `bool recognize(cv::Mat&)`
 
@@ -85,7 +85,7 @@ public:
 
 ### 模型训练器
 
-1. 类声明如下：
+1. 类声明如下
 
 ```c++
 /* 模型训练器 */
@@ -131,7 +131,7 @@ public:
 };
 ```
 
-1. 对外接口详解：
+2. 对外接口详解
  
     1. `bool load_train_data(const QString& /* image path */, const int& /* 类别名称 */);`
     
@@ -159,11 +159,12 @@ public:
                 save_offset[ 保存各点系数 ] --> mend(结束)
                 ```
 
-            3. 计算系数：流程中提到的 **计算系数** 指的是当前面部区域的高度；
-            4. 计算各点系数：这里提到的 **计算各点系数** 指的是根据这两脸上的每一点计算得到的若干数据：
+            3. 人脸识别：这里的人脸识别调用如上介绍的[人脸识别器](###人脸识别器)进行识别，得到面部区域以及特征点数据；
+            4. 计算系数：流程中提到的 **计算系数** 指的是当前面部区域的高度；
+            5. 计算各点系数：这里提到的 **计算各点系数** 指的是根据这两脸上的每一点计算得到的若干数据：
                 1. 计算 $当前点到这张脸最左端距离 / 整张脸宽度$ 得到的数据保存下来;
                 2. 计算 $当前点到这张脸最上端距离 / 整张脸高度$ 得到的数据保存下来;
-            5. 保存各点系数：保存系数到类的属性里，当调用如下`bool train_module_2_xml();`方法时，将保存到属性中的系数传递给svm进行训练;
+            6. 保存各点系数：保存系数到类的属性里，当调用如下`bool train_module_2_xml();`方法时，将保存到属性中的系数传递给svm进行训练;
 
         2. 
     
@@ -171,6 +172,42 @@ public:
         
         创建svm对象，设置属性，传入各点计算得到的数据开始训练;
 
+### 表情识别器
+
+1. 类声明如下
+
+```c++
+/* 表情识别器 */
+class SSI_Expression_Recognition {
+private: 
+    cv::Ptr<ns_CVML::SVM>   svm;
+
+    /* 人脸识别器 */
+    SSI_Face_Recognition    *sfr;
+
+public:
+    SSI_Expression_Recognition(const QString& /* module file path */);
+    ~SSI_Expression_Recognition();
+
+    /* 表情识别，传入图片，获得表情 */
+    bool recognize(const QImage&, int& /* face type */);
+};
+```
+
+2. 对外接口说明
+    1. `bool recognize(const QImage&, int& /* face type */);`
+        该方法用于表情识别，需传入待识别图片以及传出参数表情类型，识别结束后，通过第二个表情类型这个传出参数，将表情类型传出；
+        ```mermaid
+        graph TB
+        
+        mstart(开始) --> face_reg[ 人脸识别 ]
+        face_reg[ 人脸识别 ] --> calc_offset[ 计算系数 ]
+        calc_offset[ 计算系数 ] --> calc_every_point[ 计算各点系数 ]
+        calc_every_point[ 计算各点系数 ] --> query[ 调用模型查询 ]
+        query[ 调用模型查询 ] --> ret[ 传出结果 ]
+        ret[ 传出结果 ] --> mend(结束)
+
+        ```
 
 ---
 参考：
