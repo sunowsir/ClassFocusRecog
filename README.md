@@ -58,7 +58,7 @@ public:
 };
 ```
 
-1. 对外接口详解
+2. 对外接口详解
 
     1. `bool recognize(cv::Mat&)`
 
