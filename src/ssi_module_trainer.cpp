@@ -22,16 +22,16 @@ bool SSI_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, float *kp_off
     std::vector<dlib::full_object_detection> &shapes = this->sfr->shapes_get();
 
     /* 系数 */
-    float offset = -(faces[0].top() - faces[0].bottom());
+    float offset = -(faces[0].top() - faces[0].bottom()) / (float)SSI_FACE_MAX;
 
     int kp_offset_arr_num = 0;
     for (int j = 0; j < 68; j++) {
 
-        float kp_offset = shapes[0].part(j).x() - faces[0].left()  / offset;
+        float kp_offset = (shapes[0].part(j).x() - faces[0].left()) / offset;
         if (nullptr != kp_offset_arr)
             kp_offset_arr[kp_offset_arr_num++] = kp_offset;
 
-        kp_offset = shapes[0].part(j).y() - faces[0].left()  / offset;
+        kp_offset = (shapes[0].part(j).y() - faces[0].left()) / offset;
         if (nullptr != kp_offset_arr)
             kp_offset_arr[kp_offset_arr_num++] = kp_offset;
     }

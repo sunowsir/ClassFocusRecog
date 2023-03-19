@@ -35,7 +35,7 @@ bool SSI_Expression_Recognition::recognize(const QImage& img, int& face_type) {
     std::vector<dlib::full_object_detection> &shapes = this->sfr->shapes_get();
 
     /* 系数 */
-    float offset = -(faces[0].top() - faces[0].bottom());
+    float offset = -(faces[0].top() - faces[0].bottom()) / (float)SSI_FACE_MAX;
 
     float testData[1][2 * 68];
     for (int i = 0; i < 68; i++) {

@@ -27,10 +27,11 @@
 #include "ssi_face_recognition.h"
 
 
-#define SSI_FACE_BASE       100
-#define SSI_face_COMM       SSI_FACE_BASE + 0
-#define SSI_face_HAPPY      SSI_FACE_BASE + 1
-#define SSI_face_HADE       SSI_FACE_BASE + 2
+#define SSI_FACE_BASE       (100)
+#define SSI_face_COMM       (SSI_FACE_BASE + 0 * 50)
+#define SSI_face_HAPPY      (SSI_FACE_BASE + 1 * 50)
+#define SSI_face_HADE       (SSI_FACE_BASE + 2 * 50)
+#define SSI_FACE_MAX        (1000)
 
 namespace ns_fs = std::filesystem;
 namespace ns_CVML = cv::ml;
