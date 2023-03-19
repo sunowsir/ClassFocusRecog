@@ -24,8 +24,6 @@ bool SSI_Face_Recognition::recognize(cv::Mat &frame) {
     /* 提取灰度图 */
     cv::cvtColor(frame, dst, CV_BGR2GRAY);
 
-    std::vector<cv::Rect> facess;
-
     /* dlib的matrix */
     dlib::array2d<dlib::bgr_pixel> dimg;
 
