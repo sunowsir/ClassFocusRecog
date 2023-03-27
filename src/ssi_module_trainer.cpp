@@ -189,7 +189,7 @@ bool SSI_Module_Trainer::train_module_test(const QString& img_path,
 
     std::cout << "使用训练图片进行模型识别测试: " << std::endl;
 
-    switch(face_type) {
+    switch(expected_face_type) {
         case SSI_face_COMM: {
             std::cout << "平静";
         } break;
