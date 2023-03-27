@@ -51,7 +51,7 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
 
     this->capture_timer = new QTimer(this);
 
-    this->ser = new SSI_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
+    // this->ser = new SSI_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
     
     /* connect signal with slot */
 
@@ -117,7 +117,7 @@ void SSI_Widget::slots_open_camera() {
     /* 打开摄像头 */
     this->selected_camera->start();
 
-    this->capture_timer->start(5 * 1000);
+    this->capture_timer->start(500);
 
     return ;
 }
@@ -134,7 +134,7 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
 }
 
 void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
-#if 0
+#if 1
     /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
     SSI_Module_Trainer smt(3, 50);
@@ -145,30 +145,49 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
 
     smt.train_module_2_xml();
+
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/comm"), SSI_face_COMM);
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/happy"), SSI_face_HAPPY);
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
+
+    exit(0);
 #endif
 
-
-    qDebug() << "开始识别";
+#if 0
     int face_type = 0;
     this->ser->recognize(frameImage, face_type);
-    qDebug() << "识别结束";
 
-    qDebug() << face_type;
-
+    std::cout << face_type << ": ";
     switch(face_type) {
-        case SSI_face_COMM: {
-            qDebug() << "平静";
+        /*
+        case 170: {
+            std::cout << "平静" << std::endl;
         } break;
-        case SSI_face_HAPPY: {
-            qDebug() << "开心";
+        case 250: {
+            std::cout << "开心" << std::endl;
         } break;
-        case SSI_face_HADE: {
-            qDebug() << "厌恶";
+        case 300: {
+            std::cout << "厌恶" << std::endl;
         } break;
         default: {
-            qDebug() << "unknow";
+            std::cout << "unknow" << std::endl;
+        }
+        */
+        case SSI_face_COMM: {
+            std::cout << "平静" << std::endl;
+        } break;
+        case SSI_face_HAPPY: {
+            std::cout << "开心" << std::endl;
+        } break;
+        case SSI_face_HADE: {
+            std::cout << "厌恶" << std::endl;
+        } break;
+        default: {
+            std::cout << "unknow" << std::endl;
         }
     }
+
+#endif
 
     return ;
 }

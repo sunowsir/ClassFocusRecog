@@ -28,10 +28,12 @@
 
 
 #define SSI_FACE_BASE       (100)
-#define SSI_face_COMM       (SSI_FACE_BASE + 0 * 50)
-#define SSI_face_HAPPY      (SSI_FACE_BASE + 1 * 50)
-#define SSI_face_HADE       (SSI_FACE_BASE + 2 * 50)
-#define SSI_FACE_MAX        (1000)
+#define SSI_FACE_STEP       (50)
+#define SSI_face_COMM       (SSI_FACE_BASE + 0 * SSI_FACE_STEP)
+#define SSI_face_HAPPY      (SSI_FACE_BASE + 1 * SSI_FACE_STEP)
+#define SSI_face_HADE       (SSI_FACE_BASE + 2 * SSI_FACE_STEP)
+#define SSI_FACE_MAX        (SSI_FACE_BASE + 2 * SSI_FACE_STEP)
+
 
 namespace ns_fs = std::filesystem;
 namespace ns_CVML = cv::ml;

@@ -17,6 +17,7 @@
 #include <dlib/image_processing.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
+#include <dlib/image_processing/shape_predictor.h>
 
 #include <QDir>
 #include <QImage>
@@ -29,22 +30,21 @@ private:
     /* 人脸形状探测器 */
     dlib::shape_predictor sp;
 
-    /* 一系列人脸所在区域 */
-    std::vector<dlib::rectangle> faces;
-
-    /* 人脸特征点分布 */
-    std::vector<dlib::full_object_detection> shapes;
-
-    /* 加载dlib的人脸识别器 */
+    /* dlib 人脸识别器 */
     dlib::frontal_face_detector detector;
 
+    /* haar 人脸检测器(haar级联分类器), 与detector二选一 */
+    cv::CascadeClassifier faceDetector;
+
+private: 
+    bool dlib_recognize(cv::Mat&, std::vector<dlib::rectangle>&, std::vector<dlib::full_object_detection>&);
+    bool cv_recognize(cv::Mat&, std::vector<dlib::rectangle>&, std::vector<dlib::full_object_detection>&);
+
 public: 
-    SSI_Face_Recognition(const QString&);
+    SSI_Face_Recognition(const QString&, const QString&);
     ~SSI_Face_Recognition();
 
-    bool recognize(cv::Mat&);
-    std::vector<dlib::rectangle>& faces_get();
-    std::vector<dlib::full_object_detection>& shapes_get();
+    bool recognize(cv::Mat&, std::vector<dlib::rectangle>&, std::vector<dlib::full_object_detection>&);
 };
 
 #endif

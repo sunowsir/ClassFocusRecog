@@ -46,11 +46,11 @@ private:
     /* dlib的matrix */
     dlib::array2d<dlib::bgr_pixel> dimg;
 
-    /* 训练得到的系数数组 */
-    float **trans_kp_arr;
+    /* 处理后的特征值数据集集 */
+    cv::Mat *trans_mat;
 
-    /* 表情标签数组 */
-    int *face_label;
+    /* 表情标签数据集 */
+    cv::Mat *trans_label;
 
     /* 用于保存训练系数数组的行数 */
     unsigned int type_num;
@@ -62,9 +62,8 @@ private:
     SSI_Face_Recognition *sfr;
 
 private: 
-    /* 采集并保存特征点 */
-    bool capture_and_save_keypoint(cv::Mat&, float* = nullptr);
-
+    /* 采集特征点，并根据特征点计算特征向量，保存特征向量到数据集中 */
+    bool capture_and_save_keypoint(cv::Mat&, int&);
 public: 
 
     SSI_Module_Trainer(int /* type num */, int /* img num */);
@@ -76,6 +75,10 @@ public:
 
     /* 训练模型，并导出为xml模型文件 */
     bool train_module_2_xml();
+
+    /* 模型测试 */
+    bool train_module_test(const QString& /* image path */, 
+        const int&/* 预期表情类型 */);
 };
 
 #endif

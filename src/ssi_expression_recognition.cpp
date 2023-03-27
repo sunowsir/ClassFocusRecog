@@ -11,7 +11,9 @@
 SSI_Expression_Recognition::SSI_Expression_Recognition(const QString& module_filepath) {
     this->svm = ns_CVML::StatModel::load<ns_CVML::SVM>(module_filepath.toStdString());
     this->sfr = new SSI_Face_Recognition(QCoreApplication::applicationDirPath() + 
-        QString("/shape_predictor_68_face_landmarks.dat"));
+        QString("/shape_predictor_68_face_landmarks.dat"), 
+        QCoreApplication::applicationDirPath() + 
+        QString("/haarcascade_frontalface_alt.xml"));
 }
 
 SSI_Expression_Recognition::~SSI_Expression_Recognition() {
@@ -21,31 +23,43 @@ SSI_Expression_Recognition::~SSI_Expression_Recognition() {
 bool SSI_Expression_Recognition::recognize(const QImage& img, int& face_type) {
     SSI_Image_Converter sic;
     cv::Mat frame = sic.qimage_2_mat(img);
+
+    /* 一系列人脸所在区域 */
+    std::vector<dlib::rectangle> faces;
+
+    /* 人脸特征点分布 */
+    std::vector<dlib::full_object_detection> shapes;
     
     /* 开始识别 */
-    if (false == this->sfr->recognize(frame)) {
+    if (false == this->sfr->recognize(frame, faces, shapes)) {
         qDebug() << "sfr.recognize failed.";
         return false;
     }
 
-    /* 一系列人脸所在区域 */
-    std::vector<dlib::rectangle> &faces = this->sfr->faces_get();
-
-    /* 人脸特征点分布 */
-    std::vector<dlib::full_object_detection> &shapes = this->sfr->shapes_get();
-
     /* 系数 */
     float offset = -(faces[0].top() - faces[0].bottom()) / (float)SSI_FACE_MAX;
+    // float offset = -(faces[0].top() - faces[0].bottom()) / 300.0;
+    
+    cv::Mat query_mat(1, (68 * 2), CV_32FC1);
 
-    float testData[1][2 * 68];
+    // float testData[1][2 * 68];
     for (int i = 0; i < 68; i++) {
-        testData[0][i * 2] = (shapes[0].part(i).x() - faces[0].left()) / offset;
-        testData[0][i * 2+1] = (shapes[0].part(i).y() - faces[0].top()) / offset;
+        // testData[0][i * 2] = (shapes[0].part(i).x() - faces[0].left()) / offset;
+        // testData[0][i * 2 + 1] = (shapes[0].part(i).y() - faces[0].top()) / offset;
+
+        float kp_offset = (shapes[0].part(i).x() - faces[0].left()) / offset;
+        float* pixel_ptr = query_mat.ptr<float>(0, i * 2);
+        *pixel_ptr = kp_offset;
+        
+        kp_offset = (shapes[0].part(i).y() - faces[0].top()) / offset;
+        pixel_ptr = query_mat.ptr<float>(0, i * 2 + 1);
+        *pixel_ptr = kp_offset;
     }
 
     /* 查询结果 */
-    cv::Mat query(1, 2 * 68, CV_32FC1, testData);
-    face_type = (int)this->svm->predict(query);
+    // cv::Mat query(1, 2 * 68, CV_32FC1, testData);
+    face_type = (int)this->svm->predict(query_mat);
+    
 
     return true;
 }
