@@ -14,9 +14,7 @@ SSI_Image_Converter::SSI_Image_Converter() {
 SSI_Image_Converter::~SSI_Image_Converter() {
 }
 
-cv::Mat SSI_Image_Converter::qimage_2_mat(const QImage& image) {
-    cv::Mat mat;
-
+bool SSI_Image_Converter::qimage_2_mat(const QImage& image, cv::Mat& mat) {
     switch (image.format()) {
     case QImage::Format_RGB32:  //一般Qt读入彩色图后为此格式
         mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
@@ -31,22 +29,27 @@ cv::Mat SSI_Image_Converter::qimage_2_mat(const QImage& image) {
         break;
     default:
         qDebug() << "QImage to mat failed.";
-        break;
+        return false;
     }
-    return mat;
+    return true;
 }
 
-QImage SSI_Image_Converter::mat_2_qimage(const cv::Mat& mat) {
+bool SSI_Image_Converter::mat_2_qimage(const cv::Mat& mat, QImage& image) {
     if (mat.type() == CV_8UC1 || mat.type() == CV_8U) {
-        QImage image((const uchar *)mat.data, 
+        QImage img((const uchar *)mat.data, 
             mat.cols, mat.rows, mat.step, QImage::Format_Grayscale8);
-        return image;
+        image = img;
+        return true;
     }
-    else if (mat.type() != CV_8UC3) 
+    else if (mat.type() != CV_8UC3) {
         qDebug() << " mat_2_qimage err, mat.type(): " << mat.type();
+        return false;
+    }
 
-    QImage image((const uchar *)mat.data, 
+    QImage img((const uchar *)mat.data, 
         mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
-    return image.rgbSwapped();  //r与b调换
+    image = img.rgbSwapped();  //r与b调换
+
+    return true;
 }
 

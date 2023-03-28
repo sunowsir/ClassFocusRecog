@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QString>
 #include <QSettings>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
@@ -35,11 +36,14 @@ private:
 
 /* 组件 */
     
-    /* 打开摄像头的按钮 */
+    /* 打开摄像头 */
     QPushButton     *open_camera;
 
+    /* 关闭摄像头 */
+    QPushButton     *close_camera;
+
     /* 列出摄像头下拉列表 */
-    QComboBox       *camera_list;
+    QComboBox       *camera_combobox;
 
     /* 摄像头组件 */
     QVideoWidget    *camera_view;
@@ -57,10 +61,10 @@ private:
     QList<std::pair<QString, QCamera*>>     *cameras_list;
 
     /* 连接器 */
-    QMediaCaptureSession                    *captureSession;
+    QMediaCaptureSession                    *capture_session;
 
     /* 媒体采集器 */
-    QImageCapture                           *imageCapture;
+    QImageCapture                           *image_capture;
 
     /* 采集到的当前一帧画面, 该属性随刷新率变化而不断变化 */
     QImage                                  *camera_frame;
@@ -81,6 +85,7 @@ public:
 
 public slots:
     void slots_open_camera();
+    void slots_close_camera();
     void slots_select_camera(const QString&);
     void slots_capture_camera_frame(int, const QImage&);
     void slots_timer_out();

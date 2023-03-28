@@ -25,8 +25,8 @@ public:
     SSI_Image_Converter();
     ~SSI_Image_Converter();
 
-    cv::Mat qimage_2_mat(const QImage&);
-    QImage mat_2_qimage(const cv::Mat&);
+    bool qimage_2_mat(const QImage&, cv::Mat&);
+    bool mat_2_qimage(const cv::Mat&, QImage&);
 };
 
 #endif

@@ -67,6 +67,7 @@ SSI_Module_Trainer::SSI_Module_Trainer(int tnum, int inum) {
 SSI_Module_Trainer::~SSI_Module_Trainer() {
     delete this->trans_mat;
     delete this->trans_label;
+    delete this->sfr;
 
     return ;
 }
