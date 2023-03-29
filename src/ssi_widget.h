@@ -32,8 +32,6 @@ private:
 
     QSettings       *settings;
 
-    QMainWindow     *parent;
-
 /* 组件 */
     
     /* 打开摄像头 */
@@ -54,11 +52,8 @@ private:
     /* 选择的摄像头 */
     QCamera                                 *selected_camera;
 
-    /* 列出摄像头名称列表 */
-    QStringList                             *camera_name_list;
-
     /* 摄像头列表 */
-    QList<std::pair<QString, QCamera*>>     *cameras_list;
+    QList<QCameraDevice>     *cameras_list;
 
     /* 连接器 */
     QMediaCaptureSession                    *capture_session;
@@ -77,7 +72,7 @@ private:
 
 private: 
     
-    void get_camera_list();
+    void camera_devices_refresh();
 
 public: 
     SSI_Widget(QMainWindow *parent = nullptr);
