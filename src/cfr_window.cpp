@@ -1,25 +1,25 @@
 /*
-	* File     : src/ssi_window.c
+	* File     : cfr_window.c
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月05日 星期日 00时50分29秒
 */
 
-#include "ssi_window.h"
+#include "cfr_window.h"
 
-SSI_Window::SSI_Window(QWidget *parent) 
+CFR_Window::CFR_Window(QWidget *parent) 
     : QMainWindow(parent) {
 
     this->resize(800, 600);
     this->setWindowTitle(tr("课堂状态监测系统演示程序"));
 
-    this->ssi_widget = new SSI_Widget(this);
+    this->ssi_widget = new CFR_Widget(this);
     setCentralWidget(this->ssi_widget);
     
 }
 
-SSI_Window::~SSI_Window() {
+CFR_Window::~CFR_Window() {
     this->ssi_widget->close();
     delete this->ssi_widget;
 }

@@ -1,28 +1,28 @@
 /*
-	* File     : ssi_expression_recognition.cpp
+	* File     : cfr_expression_recognition.cpp
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月13日 星期一 21时11分41秒
 */
 
-#include "ssi_expression_recognition.h"
+#include "cfr_expression_recognition.h"
 
-SSI_Expression_Recognition::SSI_Expression_Recognition(const QString& module_filepath) {
+CFR_Expression_Recognition::CFR_Expression_Recognition(const QString& module_filepath) {
     this->svm = ns_CVML::StatModel::load<ns_CVML::SVM>(module_filepath.toStdString());
-    this->sfr = new SSI_Face_Recognition(QCoreApplication::applicationDirPath() + 
+    this->sfr = new CFR_Face_Recognition(QCoreApplication::applicationDirPath() + 
         QString("/shape_predictor_68_face_landmarks.dat"), 
         QCoreApplication::applicationDirPath() + 
         QString("/haarcascade_frontalface_alt.xml"));
 }
 
-SSI_Expression_Recognition::~SSI_Expression_Recognition() {
+CFR_Expression_Recognition::~CFR_Expression_Recognition() {
     delete this->sfr;
 }
 
 /* 表情识别，传入图片，获得表情 */
-bool SSI_Expression_Recognition::recognize(const QImage& img, int& face_type) {
-    SSI_Image_Converter sic;
+bool CFR_Expression_Recognition::recognize(const QImage& img, int& face_type) {
+    CFR_Image_Converter sic;
     cv::Mat frame;
     if (!sic.qimage_2_mat(img, frame)) {
         qDebug() << "convert QImage to img failed.";
@@ -42,7 +42,7 @@ bool SSI_Expression_Recognition::recognize(const QImage& img, int& face_type) {
     }
 
     /* 系数 */
-    float offset = -(faces[0].top() - faces[0].bottom()) / (float)SSI_FACE_MAX;
+    float offset = -(faces[0].top() - faces[0].bottom()) / (float)CFR_FACE_MAX;
     
     cv::Mat query_mat(1, (68 * 2), CV_32FC1);
 

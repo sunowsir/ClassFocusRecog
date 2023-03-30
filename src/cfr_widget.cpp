@@ -1,14 +1,14 @@
 /*
-	* File     : ssi_widget.cpp
+	* File     : cfr_widget.cpp
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月05日 星期日 01时18分08秒
 */
 
-#include "ssi_widget.h"
+#include "cfr_widget.h"
 
-SSI_Widget::SSI_Widget(QMainWindow *parent) 
+CFR_Widget::CFR_Widget(QMainWindow *parent) 
     : QWidget(parent) {
     /* save config */
     this->settings = new QSettings(QCoreApplication::applicationDirPath() + 
@@ -50,7 +50,7 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     this->capture_timer->stop();
 
     /* 人脸识别器 */
-    this->ser = new SSI_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
+    this->ser = new CFR_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
     
     /* connect signal with slot */
 
@@ -75,7 +75,7 @@ SSI_Widget::SSI_Widget(QMainWindow *parent)
     return ;
 }
 
-SSI_Widget::~SSI_Widget() {
+CFR_Widget::~CFR_Widget() {
     delete this->open_camera;
     delete this->close_camera;
     delete this->settings;
@@ -90,7 +90,7 @@ SSI_Widget::~SSI_Widget() {
     return ;
 }
 
-void SSI_Widget::camera_devices_refresh() {
+void CFR_Widget::camera_devices_refresh() {
     if (QMediaDevices::videoInputs().count() <= 0) {
         qDebug() << "[ERROR] no video inputs devices";
         QMessageBox::critical(this, tr("错误"), tr("找不到摄像头"));
@@ -131,7 +131,7 @@ void SSI_Widget::camera_devices_refresh() {
 
 /* slot function */
 
-void SSI_Widget::slots_open_camera() {
+void CFR_Widget::slots_open_camera() {
     this->camera_devices_refresh();
     if (nullptr == this->selected_camera) {
         QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
@@ -153,7 +153,7 @@ void SSI_Widget::slots_open_camera() {
     return ;
 }
 
-void SSI_Widget::slots_close_camera() {
+void CFR_Widget::slots_close_camera() {
     /* 关闭定时器 */
     if (this->capture_timer->isActive())
         this->capture_timer->stop();
@@ -169,7 +169,7 @@ void SSI_Widget::slots_close_camera() {
     return ;
 }
 
-void SSI_Widget::slots_select_camera(const QString& selected_name) {
+void CFR_Widget::slots_select_camera(const QString& selected_name) {
     for (auto& device : *this->cameras_list) {
         if (selected_name != device.description())
             continue;
@@ -181,22 +181,22 @@ void SSI_Widget::slots_select_camera(const QString& selected_name) {
     return ;
 }
 
-void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
+void CFR_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
 #if 0
     /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
-    SSI_Module_Trainer smt(3, 50);
+    CFR_Module_Trainer smt(3, 50);
     
 
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), SSI_face_COMM);
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), SSI_face_HAPPY);
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), CFR_face_COMM);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), CFR_face_HAPPY);
+    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), CFR_face_HADE);
 
     smt.train_module_2_xml();
 
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/comm"), SSI_face_COMM);
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/happy"), SSI_face_HAPPY);
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/hade"), SSI_face_HADE);
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/comm"), CFR_face_COMM);
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/happy"), CFR_face_HAPPY);
+    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/hade"), CFR_face_HADE);
 
     exit(0);
 #endif
@@ -207,13 +207,13 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
 
     std::cout << face_type << ": ";
     switch(face_type) {
-        case SSI_face_COMM: {
+        case CFR_face_COMM: {
             std::cout << "平静" << std::endl;
         } break;
-        case SSI_face_HAPPY: {
+        case CFR_face_HAPPY: {
             std::cout << "开心" << std::endl;
         } break;
-        case SSI_face_HADE: {
+        case CFR_face_HADE: {
             std::cout << "厌恶" << std::endl;
         } break;
         default: {
@@ -226,7 +226,7 @@ void SSI_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     return ;
 }
 
-void SSI_Widget::slots_timer_out() {
+void CFR_Widget::slots_timer_out() {
     this->image_capture->capture();
 }
 

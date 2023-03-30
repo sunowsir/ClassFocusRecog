@@ -1,14 +1,14 @@
 /*
-	* File     : ssi_module_trainer.cpp
+	* File     : cfr_module_trainer.cpp
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月07日 星期二 19时44分57秒
 */
 
-#include "ssi_module_trainer.h"
+#include "cfr_module_trainer.h"
 
-bool SSI_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, int& trans_mat_row) {
+bool CFR_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, int& trans_mat_row) {
     /* 一系列人脸所在区域 */
     std::vector<dlib::rectangle> faces;
 
@@ -22,7 +22,7 @@ bool SSI_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, int& trans_ma
     }
 
     /* 系数 */
-    float offset = -(faces[0].top() - faces[0].bottom()) / (float)SSI_FACE_MAX;
+    float offset = -(faces[0].top() - faces[0].bottom()) / (float)CFR_FACE_MAX;
 
     /* 一个图片有68个特征值，每个特征值能得到两个特征向量 */
     for (int i = 0; i < 68; i++) {
@@ -38,7 +38,7 @@ bool SSI_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, int& trans_ma
     return true;
 }
 
-SSI_Module_Trainer::SSI_Module_Trainer(int tnum, int inum) {
+CFR_Module_Trainer::CFR_Module_Trainer(int tnum, int inum) {
     if (tnum <= 0) {
         qDebug() << "type_num <= 0";
         return ;
@@ -56,7 +56,7 @@ SSI_Module_Trainer::SSI_Module_Trainer(int tnum, int inum) {
     this->trans_mat = new cv::Mat(row, (68 * 2), CV_32FC1);
     this->trans_label = new cv::Mat(row, 1, CV_32SC1);
 
-    this->sfr = new SSI_Face_Recognition(QCoreApplication::applicationDirPath() + 
+    this->sfr = new CFR_Face_Recognition(QCoreApplication::applicationDirPath() + 
         QString("/shape_predictor_68_face_landmarks.dat"), 
         QCoreApplication::applicationDirPath() + 
         QString("/haarcascade_frontalface_alt.xml"));
@@ -64,7 +64,7 @@ SSI_Module_Trainer::SSI_Module_Trainer(int tnum, int inum) {
     return ;
 }
 
-SSI_Module_Trainer::~SSI_Module_Trainer() {
+CFR_Module_Trainer::~CFR_Module_Trainer() {
     delete this->trans_mat;
     delete this->trans_label;
     delete this->sfr;
@@ -72,10 +72,10 @@ SSI_Module_Trainer::~SSI_Module_Trainer() {
     return ;
 }
 
-bool SSI_Module_Trainer::load_train_data(const QString& img_path, 
+bool CFR_Module_Trainer::load_train_data(const QString& img_path, 
     const int& face_type) {
-    if (face_type < SSI_FACE_BASE) {
-        qDebug() << "face_type < SSI_FACE_BASE";
+    if (face_type < CFR_FACE_BASE) {
+        qDebug() << "face_type < CFR_FACE_BASE";
         return false;
     }
     if (QString("") == img_path) {
@@ -85,7 +85,7 @@ bool SSI_Module_Trainer::load_train_data(const QString& img_path,
 
     int row = (this->type_num * this->img_num);
 
-    int img_idx_start = (face_type - SSI_FACE_BASE) / SSI_FACE_STEP  * this->img_num;
+    int img_idx_start = (face_type - CFR_FACE_BASE) / CFR_FACE_STEP  * this->img_num;
 
     for (int i = img_idx_start; i < img_idx_start + this->img_num; i++) {
         int* pixel_ptr = this->trans_label->ptr<int>(i);
@@ -93,13 +93,13 @@ bool SSI_Module_Trainer::load_train_data(const QString& img_path,
     }
 
     switch(face_type) {
-        case SSI_face_COMM: {
+        case CFR_face_COMM: {
             std::cout << "平静";
         } break;
-        case SSI_face_HAPPY: {
+        case CFR_face_HAPPY: {
             std::cout << "开心";
         } break;
-        case SSI_face_HADE: {
+        case CFR_face_HADE: {
             std::cout << "厌恶";
         } break;
         default: {
@@ -138,7 +138,7 @@ bool SSI_Module_Trainer::load_train_data(const QString& img_path,
     return true;
 }
 
-bool SSI_Module_Trainer::train_module_2_xml() {
+bool CFR_Module_Trainer::train_module_2_xml() {
     int row = (this->type_num * this->img_num);
 
     /* 构造svm对象 */
@@ -179,25 +179,25 @@ bool SSI_Module_Trainer::train_module_2_xml() {
 }
 
 /* 模型测试 */
-bool SSI_Module_Trainer::train_module_test(const QString& img_path, 
+bool CFR_Module_Trainer::train_module_test(const QString& img_path, 
     const int& expected_face_type) {
 
     /* 表情识别器 */
-    SSI_Expression_Recognition ser(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
+    CFR_Expression_Recognition ser(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
 
-    int img_idx = (expected_face_type - SSI_FACE_BASE) / SSI_FACE_STEP  * this->img_num;
+    int img_idx = (expected_face_type - CFR_FACE_BASE) / CFR_FACE_STEP  * this->img_num;
     int face_type = 0;
 
     std::cout << "使用训练图片进行模型识别测试: " << std::endl;
 
     switch(expected_face_type) {
-        case SSI_face_COMM: {
+        case CFR_face_COMM: {
             std::cout << "平静";
         } break;
-        case SSI_face_HAPPY: {
+        case CFR_face_HAPPY: {
             std::cout << "开心";
         } break;
-        case SSI_face_HADE: {
+        case CFR_face_HADE: {
             std::cout << "厌恶";
         } break;
         default: {
@@ -224,13 +224,13 @@ bool SSI_Module_Trainer::train_module_test(const QString& img_path,
 
         std::cout << "预期：";
         switch(expected_face_type) {
-            case SSI_face_COMM: {
+            case CFR_face_COMM: {
                 std::cout << "平静";
             } break;
-            case SSI_face_HAPPY: {
+            case CFR_face_HAPPY: {
                 std::cout << "开心";
             } break;
-            case SSI_face_HADE: {
+            case CFR_face_HADE: {
                 std::cout << "厌恶";
             } break;
             default: {
@@ -240,13 +240,13 @@ bool SSI_Module_Trainer::train_module_test(const QString& img_path,
         std::cout << "(" << expected_face_type << "), 识别结果: ";
 
         switch(face_type) {
-            case SSI_face_COMM: {
+            case CFR_face_COMM: {
                 std::cout << "平静";
             } break;
-            case SSI_face_HAPPY: {
+            case CFR_face_HAPPY: {
                 std::cout << "开心";
             } break;
-            case SSI_face_HADE: {
+            case CFR_face_HADE: {
                 std::cout << "厌恶";
             } break;
             default: {

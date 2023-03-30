@@ -2,7 +2,7 @@
 #include <QLocale>
 #include <QTranslator>
 
-#include "ssi_window.h"
+#include "cfr_window.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,15 +11,15 @@ int main(int argc, char *argv[])
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
-        const QString baseName = "SSI_" + QLocale(locale).name();
+        const QString baseName = "CFR_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
             start.installTranslator(&translator);
             break;
         }
     }
 
-    SSI_Window ssi_window;
-    ssi_window.show();
+    CFR_Window cfr_window;
+    cfr_window.show();
 
     return start.exec();
 }

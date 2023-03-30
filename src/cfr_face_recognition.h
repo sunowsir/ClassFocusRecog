@@ -1,13 +1,13 @@
 /*
-	* File     : ssi_face_recognition.h
+	* File     : cfr_face_recognition.h
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月13日 星期一 20时28分08秒
 */
 
-#ifndef _SSI_FACE_RECOGNITION_H
-#define _SSI_FACE_RECOGNITION_H
+#ifndef _CFR_FACE_RECOGNITION_H
+#define _CFR_FACE_RECOGNITION_H
 
 #include <dlib/opencv.h>
 #include <dlib/image_io.h>
@@ -25,7 +25,7 @@
 
 
 /* 人脸识别器 */
-class SSI_Face_Recognition {
+class CFR_Face_Recognition {
 private: 
     /* 人脸形状探测器 */
     dlib::shape_predictor sp;
@@ -41,8 +41,8 @@ private:
     bool cv_recognize(cv::Mat&, std::vector<dlib::rectangle>&, std::vector<dlib::full_object_detection>&);
 
 public: 
-    SSI_Face_Recognition(const QString&, const QString&);
-    ~SSI_Face_Recognition();
+    CFR_Face_Recognition(const QString&, const QString&);
+    ~CFR_Face_Recognition();
 
     bool recognize(cv::Mat&, std::vector<dlib::rectangle>&, std::vector<dlib::full_object_detection>&);
 };

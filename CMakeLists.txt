@@ -24,14 +24,14 @@ find_package(dlib REQUIRED)
 
 set(TS_FILES CFR_zh_CN.ts)
 
-add_executable(SSI
+add_executable(cfr
     src/main.cpp
-    src/ssi_window.cpp
-    src/ssi_widget.cpp
-    src/ssi_module_trainer.cpp
-    src/ssi_face_recognition.cpp
-    src/ssi_image_converter.cpp
-    src/ssi_expression_recognition.cpp
+    src/cfr_window.cpp
+    src/cfr_widget.cpp
+    src/cfr_module_trainer.cpp
+    src/cfr_face_recognition.cpp
+    src/cfr_image_converter.cpp
+    src/cfr_expression_recognition.cpp
     ${TS_FILES}
 )
 

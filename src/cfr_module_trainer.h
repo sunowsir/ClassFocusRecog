@@ -1,13 +1,13 @@
 /*
-	* File     : ssi_module_trainer.h
+	* File     : cfr_module_trainer.h
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月07日 星期二 19时44分59秒
 */
 
-#ifndef _SSI_MODULE_TRAINER_H
-#define _SSI_MODULE_TRAINER_H
+#ifndef _CFR_MODULE_TRAINER_H
+#define _CFR_MODULE_TRAINER_H
 
 #include <ctime>
 #include <vector>
@@ -29,15 +29,15 @@
 #include <QImage>
 #include <QCoreApplication>
 
-#include "ssi_face_recognition.h"
-#include "ssi_expression_recognition.h"
+#include "cfr_face_recognition.h"
+#include "cfr_expression_recognition.h"
 
 namespace ns_fs = std::filesystem;
 namespace ns_CVML = cv::ml;
 
 
 /* 模型训练器 */
-class SSI_Module_Trainer {
+class CFR_Module_Trainer {
 private: 
 
     /* 人脸形状探测器 */
@@ -59,15 +59,15 @@ private:
     unsigned int img_num;
 
     /* 人脸识别器 */
-    SSI_Face_Recognition *sfr;
+    CFR_Face_Recognition *sfr;
 
 private: 
     /* 采集特征点，并根据特征点计算特征向量，保存特征向量到数据集中 */
     bool capture_and_save_keypoint(cv::Mat&, int&);
 public: 
 
-    SSI_Module_Trainer(int /* type num */, int /* img num */);
-    ~SSI_Module_Trainer();
+    CFR_Module_Trainer(int /* type num */, int /* img num */);
+    ~CFR_Module_Trainer();
 
     /* 载入训练图片，以及该组图片对应的表情 */
     bool load_train_data(const QString& /* image path */, 

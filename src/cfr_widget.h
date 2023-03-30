@@ -1,13 +1,13 @@
 /*
-	* File     : ssi_widget.h
+	* File     : cfr_widget.h
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月05日 星期日 01时13分49秒
 */
 
-#ifndef _SSI_WIDGET_H
-#define _SSI_WIDGET_H
+#ifndef _CFR_WIDGET_H
+#define _CFR_WIDGET_H
 
 #include <QTimer>
 #include <QString>
@@ -23,10 +23,10 @@
 #include <QtMultimedia>
 #include <QMediaDevices>
 
-#include "ssi_module_trainer.h"
-#include "ssi_expression_recognition.h"
+#include "cfr_module_trainer.h"
+#include "cfr_expression_recognition.h"
 
-class SSI_Widget: public QWidget {
+class CFR_Widget: public QWidget {
     Q_OBJECT
 private: 
 
@@ -68,15 +68,15 @@ private:
     QTimer                                  *capture_timer;
 
     /* 表情识别器 */
-    SSI_Expression_Recognition              *ser;
+    CFR_Expression_Recognition              *ser;
 
 private: 
     
     void camera_devices_refresh();
 
 public: 
-    SSI_Widget(QMainWindow *parent = nullptr);
-    ~SSI_Widget();
+    CFR_Widget(QMainWindow *parent = nullptr);
+    ~CFR_Widget();
 
 public slots:
     void slots_open_camera();

@@ -1,14 +1,14 @@
 /*
-	* File     : ssi_face_recognition.cpp
+	* File     : cfr_face_recognition.cpp
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
 	* Creation : 2023年03月13日 星期一 20时28分12秒
 */
 
-#include "ssi_face_recognition.h"
+#include "cfr_face_recognition.h"
 
-SSI_Face_Recognition::SSI_Face_Recognition(const QString &sp_fpath, const QString &fd_fpath) {
+CFR_Face_Recognition::CFR_Face_Recognition(const QString &sp_fpath, const QString &fd_fpath) {
     /* 加载人脸形状探测器 */
     dlib::deserialize(sp_fpath.toStdString()) >> this->sp;
 
@@ -18,10 +18,10 @@ SSI_Face_Recognition::SSI_Face_Recognition(const QString &sp_fpath, const QStrin
         qDebug() << "Failed to load face detector.";
 }
 
-SSI_Face_Recognition::~SSI_Face_Recognition() {
+CFR_Face_Recognition::~CFR_Face_Recognition() {
 }
 
-bool SSI_Face_Recognition::dlib_recognize(cv::Mat &frame, 
+bool CFR_Face_Recognition::dlib_recognize(cv::Mat &frame, 
     std::vector<dlib::rectangle>& dlib_faces, 
     std::vector<dlib::full_object_detection>& shapes) {
     cv::Mat dst;
@@ -58,7 +58,7 @@ bool SSI_Face_Recognition::dlib_recognize(cv::Mat &frame,
     return true;
 }
 
-bool SSI_Face_Recognition::cv_recognize(cv::Mat &frame, 
+bool CFR_Face_Recognition::cv_recognize(cv::Mat &frame, 
     std::vector<dlib::rectangle>& dlib_faces, 
     std::vector<dlib::full_object_detection>& shapes) {
     cv::Mat gray;
@@ -111,7 +111,7 @@ bool SSI_Face_Recognition::cv_recognize(cv::Mat &frame,
     return true;
 }
 
-bool SSI_Face_Recognition::recognize(cv::Mat &frame, 
+bool CFR_Face_Recognition::recognize(cv::Mat &frame, 
     std::vector<dlib::rectangle>& faces, 
     std::vector<dlib::full_object_detection>& shape) {
     return this->cv_recognize(frame, faces, shape);
