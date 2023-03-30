@@ -1,5 +1,5 @@
-# Student Status Identification
-> 线上课堂状态监测系统
+# Class Focus Recog
+> 线上课堂状态监测
 
 ## 编译说明
 1. 根据不同平台不同，这里不具体说明环境搭建；
