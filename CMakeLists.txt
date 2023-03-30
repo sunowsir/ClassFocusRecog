@@ -22,7 +22,7 @@ find_package(OpenCV REQUIRED)
 # dlib
 find_package(dlib REQUIRED)
 
-set(TS_FILES SSI_zh_CN.ts)
+set(TS_FILES CFR_zh_CN.ts)
 
 add_executable(SSI
     src/main.cpp
@@ -43,7 +43,7 @@ include_directories(
 )
 
 
-target_link_libraries(SSI 
+target_link_libraries(cfr 
     PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets
     ${OpenCV_LIBS}
     dlib::dlib
