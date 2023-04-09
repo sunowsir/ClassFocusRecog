@@ -1,13 +1,25 @@
-/*
-	* File     : main.cpp
-	* Author   : sunowsir
-	* Mail     : sunowsir@163.com
-	* Github   : github.com/sunowsir
-	* Creation : 2023年04月08日 星期六 20时12分02秒
-*/
+#include <QApplication>
+#include <QLocale>
+#include <QTranslator>
 
-#include <iostream>
+#include "cfr_window.h"
 
-int main() {
-    return 0;
+int main(int argc, char *argv[])
+{
+    QApplication start(argc, argv);
+
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "CFR_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            start.installTranslator(&translator);
+            break;
+        }
+    }
+
+    CFR_Window cfr_window;
+    cfr_window.show();
+
+    return start.exec();
 }

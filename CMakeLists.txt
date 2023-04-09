@@ -9,9 +9,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 可执行文件输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
-
 find_package(Qt6 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt6 COMPONENTS Multimedia MultimediaWidgets REQUIRED)
 

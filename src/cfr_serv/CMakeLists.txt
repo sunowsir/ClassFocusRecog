@@ -22,6 +22,12 @@ include_directories(
 
 add_executable(cfr_serv
     src/main.cpp
+    src/cfr_window.cpp
+    src/cfr_widget.cpp
+    src/cfr_module_trainer.cpp
+    src/cfr_face_recognition.cpp
+    src/cfr_image_converter.cpp
+    src/cfr_expression_recognition.cpp
     ${TS_FILES}
 )
 
