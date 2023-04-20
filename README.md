@@ -29,34 +29,10 @@
 
 ### 人脸识别器
 
-1. 类声明如下
-
-人脸识别器用于初步处理图像，并获取到人脸特征点，该类是表情识别的最基础的必须的类
-```c++
-/* 人脸识别器 */
-class SSI_Face_Recognition {
-private: 
-    /* 人脸形状探测器 */
-    dlib::shape_predictor sp;
-
-    /* 一系列人脸所在区域 */
-    std::vector<dlib::rectangle> faces;
-
-    /* 人脸特征点分布 */
-    std::vector<dlib::full_object_detection> shapes;
-
-    /* 加载dlib的人脸识别器 */
-    dlib::frontal_face_detector detector;
-
-public: 
-    SSI_Face_Recognition(const QString&);
-    ~SSI_Face_Recognition();
-
-    bool recognize(cv::Mat&);
-    std::vector<dlib::rectangle>& faces_get();
-    std::vector<dlib::full_object_detection>& shapes_get();
-};
-```
+1. 简介
+    * 该类用来从图片中识别到人脸，然后从人脸矩阵中找到特征点，其中识别人脸使用opencv的haar识别模型，特征点识别使用dlib的68特征值识别模型，在构造该类的对象时，应当向构造函数中传入haar模型文件haarcascade_frontalface_alt.xml，以及dlib的68特征值识别模型文件shape_predictor_68_face_landmarks.dat；
+    * 使用方法详见代码cfr_expression_recognition.cpp第38行道第61行；
+    * 代码文件：`cfr_face_recognition.cpp`和`cfr_face_recognition.h`
 
 2. 对外接口详解
 
@@ -74,62 +50,20 @@ public:
         get_sharps[ 获取人脸特征分布 ] --> mend(结束)
     ```
 
-    1. `std::vector<dlib::rectangle>& faces_get()`
+    2. `std::vector<dlib::rectangle>& faces_get()`
      
         返回类的`faces`属性，用于获取人脸区域数据；
     
-    2. `std::vector<dlib::full_object_detection>& shapes_get()`
+    3. `std::vector<dlib::full_object_detection>& shapes_get()`
     
         返回类的`shapes`属性，用于获取特征值数据；
 
 
 ### 模型训练器
 
-1. 类声明如下
+1. 简介
+    * 该类用来训练表情识别模型，
 
-```c++
-/* 模型训练器 */
-class SSI_Module_Trainer {
-private: 
-
-    /* 人脸形状探测器 */
-    dlib::shape_predictor sp;
-
-    /* dlib的matrix */
-    dlib::array2d<dlib::bgr_pixel> dimg;
-
-    /* 训练得到的系数数组 */
-    float **trans_kp_arr;
-
-    /* 表情标签数组 */
-    int *face_label;
-
-    /* 用于保存训练系数数组的行数 */
-    unsigned int type_num;
-
-    /* 用于保存训练系数数组的列数 */
-    unsigned int img_num;
-
-    /* 人脸识别器 */
-    SSI_Face_Recognition *sfr;
-
-private:
-    /* 采集并保存特征点 */
-    bool capture_and_save_keypoint(cv::Mat&, float* = nullptr);
-
-public:
-
-    SSI_Module_Trainer(int /* type num */, int /* img num */);
-    ~SSI_Module_Trainer();
-
-    /* 载入训练图片，以及该组图片对应的表情 */
-    bool load_train_data(const QString& /* image path */,
-        const int& /* 类别名称 */);
-
-    /* 训练模型，并导出为xml模型文件 */
-    bool train_module_2_xml();
-};
-```
 
 2. 对外接口详解
  
@@ -174,25 +108,9 @@ public:
 
 ### 表情识别器
 
-1. 类声明如下
+1. 简介
+    * 该类用于识别表情，使用模型训练器训练得到的表情识别模型来进行表情识别，在构造该类的对象时，构造函数需要传入使用*模型训练器*训练得到的模型文件；
 
-```c++
-/* 表情识别器 */
-class SSI_Expression_Recognition {
-private: 
-    cv::Ptr<ns_CVML::SVM>   svm;
-
-    /* 人脸识别器 */
-    SSI_Face_Recognition    *sfr;
-
-public:
-    SSI_Expression_Recognition(const QString& /* module file path */);
-    ~SSI_Expression_Recognition();
-
-    /* 表情识别，传入图片，获得表情 */
-    bool recognize(const QImage&, int& /* face type */);
-};
-```
 
 2. 对外接口说明
     1. `bool recognize(const QImage&, int& /* face type */);`
