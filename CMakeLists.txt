@@ -22,4 +22,5 @@ find_package(dlib REQUIRED)
 add_subdirectory(src/cfr_serv)
 add_subdirectory(src/cfr_mgr_cli)
 add_subdirectory(src/cfr_user_cli)
+add_subdirectory(src/module_train_tool)
 
