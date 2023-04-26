@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 可执行文件输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/module_train_tool)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/ocsfs_mgr_cli)
 
 set(TS_FILES OCSFS_zh_CN.ts)
 
@@ -20,8 +20,10 @@ include_directories(
     dlib::dlib
 )
 
-add_executable(module_train_tool
+add_executable(ocsfs_mgr_cli
     src/main.cpp
+    src/ocsfs_window.cpp
+    src/ocsfs_widget.cpp
     src/ocsfs_module_trainer.cpp
     src/ocsfs_face_recognition.cpp
     src/ocsfs_image_converter.cpp
@@ -29,7 +31,7 @@ add_executable(module_train_tool
     ${TS_FILES}
 )
 
-target_link_libraries(module_train_tool
+target_link_libraries(ocsfs_mgr_cli
     PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets
     ${OpenCV_LIBS}
     dlib::dlib
