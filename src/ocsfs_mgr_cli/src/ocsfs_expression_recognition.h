@@ -51,7 +51,7 @@ public:
     ~OCSFS_Expression_Recognition();
 
     /* 表情识别，传入图片，获得表情 */
-    bool recognize(const QImage&, int& /* face type */);
+    bool recognize(const QImage&, QImage& /* out image */, int& /* face type */);
 };
 
 #endif

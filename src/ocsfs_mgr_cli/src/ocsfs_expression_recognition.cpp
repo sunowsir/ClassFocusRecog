@@ -21,11 +21,11 @@ OCSFS_Expression_Recognition::~OCSFS_Expression_Recognition() {
 }
 
 /* 表情识别，传入图片，获得表情 */
-bool OCSFS_Expression_Recognition::recognize(const QImage& img, int& face_type) {
+bool OCSFS_Expression_Recognition::recognize(const QImage& img, QImage& out_img, int& face_type) {
     OCSFS_Image_Converter sic;
     cv::Mat frame;
     if (!sic.qimage_2_mat(img, frame)) {
-        qDebug() << "convert QImage to img failed.";
+        qDebug() << "convert QImage to mat failed.";
         return false;
     }
 
@@ -41,12 +41,6 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, int& face_type) 
         return false;
     }
 
-    /* 低头和侧脸计算 */
-    double yaw = shapes[0].part(45).x() - shapes[0].part(36).x();
-    double pitch = shapes[0].part(8).y() - (shapes[0].part(27).y() + shapes[0].part(28).y()) / 2.0;
-    if (yaw < -20 || yaw > 20 || pitch > 10) 
-        std::cout << "(111111)" << std::endl;
-
     /* 系数 */
     float offset = -(faces[0].top() - faces[0].bottom()) / (float)OCSFS_FACE_MAX;
     
@@ -61,6 +55,15 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, int& face_type) 
         kp_offset = (shapes[0].part(i).y() - faces[0].top()) / offset;
         pixel_ptr = query_mat.ptr<float>(0, i * 2 + 1);
         *pixel_ptr = kp_offset;
+
+        /* 在图片上把68特征点标注出来 */
+        cv::circle(frame, 
+            cvPoint(shapes[0].part(i).x(), shapes[0].part(i).y()), 2, cv::Scalar(255, 0, 0), -1);
+    }
+
+    if (!sic.mat_2_qimage(frame, out_img)) {
+        qDebug() << "convert mat to QImage failed.";
+        return false;
     }
 
     /* 查询结果 */

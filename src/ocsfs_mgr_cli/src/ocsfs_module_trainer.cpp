@@ -219,8 +219,7 @@ bool OCSFS_Module_Trainer::train_module_test(const QString& img_path,
         QImage frame;
         frame.load(QString::fromStdString(entry.path()));
 
-        
-        ser.recognize(frame, face_type);
+        ser.recognize(frame, frame, face_type);
 
         std::cout << "预期：";
         switch(expected_face_type) {

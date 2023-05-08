@@ -208,26 +208,59 @@ void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) 
 
 #if 1
     int face_type = 0;
-    this->ser->recognize(frameImage, face_type);
+    QImage out_image;
+    this->ser->recognize(frameImage, out_image, face_type);
 
-    std::cout << face_type << ": ";
+    QString face_type_str = "result: ";
     switch(face_type) {
         case OCSFS_face_COMM: {
-            std::cout << "平静" << std::endl;
+            face_type_str += "calm";
         } break;
         case OCSFS_face_HAPPY: {
-            std::cout << "开心" << std::endl;
+            face_type_str += "happy";
         } break;
         case OCSFS_face_HADE: {
-            std::cout << "厌恶" << std::endl;
+            face_type_str += "hade";
         } break;
         default: {
             if (this->opr->recognize(frameImage))
-                std::cout << "侧脸" << std::endl;
+                face_type_str += "profile";
             else 
-                std::cout << "unknow" << std::endl;
+                face_type_str += "unknow";
         }
     }
+    face_type_str += "(" + QString::number(face_type) + ")";
+    std::cout << face_type_str.toStdString() << std::endl;
+
+    OCSFS_Image_Converter sic;
+    cv::Mat mat_out_img;
+    if (!sic.qimage_2_mat(out_image, mat_out_img)) {
+        qDebug() << __FUNCTION__ << ": convert QImage to mat failed.";
+        return ;
+    }
+
+    /* 将结果画到图片上 */
+    cv::Point org(50, 50);
+    int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+    double fontScale = 1.0;
+    cv::Scalar color(0, 0, 255);
+    int thickness = 2;
+    putText(mat_out_img, 
+        face_type_str.toStdString(), 
+        org, fontFace, fontScale, color, thickness);
+
+
+    /* 获取当前时间戳 */
+    auto now_timestamp = std::time(nullptr);
+    std::string str_now_timestamp;
+    std::stringstream ss;
+    ss << now_timestamp;
+    ss >> str_now_timestamp;
+
+    auto save_path = QCoreApplication::applicationDirPath() + 
+        QString("/") + QString(QString::fromStdString(str_now_timestamp)) + QString(".jpg");
+
+    cv::imwrite(save_path.toStdString(), mat_out_img);
 
 #endif
 
