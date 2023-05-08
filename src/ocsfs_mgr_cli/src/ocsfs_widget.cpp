@@ -50,7 +50,12 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->capture_timer->stop();
 
     /* 人脸识别器 */
-    this->ser = new OCSFS_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
+    this->ser = new OCSFS_Expression_Recognition(QCoreApplication::applicationDirPath() + 
+        QString("/SVM_DATA.xml"));
+
+    /* 侧脸识别器 */
+    this->opr = new OCSFS_Profileface_Recognition(QCoreApplication::applicationDirPath() + 
+        QString("/haarcascade_profileface.xml"));
     
     /* connect signal with slot */
 
@@ -217,7 +222,10 @@ void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) 
             std::cout << "厌恶" << std::endl;
         } break;
         default: {
-            std::cout << "unknow" << std::endl;
+            if (this->opr->recognize(frameImage))
+                std::cout << "侧脸" << std::endl;
+            else 
+                std::cout << "unknow" << std::endl;
         }
     }
 

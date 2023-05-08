@@ -28,6 +28,7 @@ add_executable(ocsfs_mgr_cli
     src/ocsfs_face_recognition.cpp
     src/ocsfs_image_converter.cpp
     src/ocsfs_expression_recognition.cpp
+    src/ocsfs_profileface_recognition.cpp
     ${TS_FILES}
 )
 

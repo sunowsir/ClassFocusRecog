@@ -41,6 +41,12 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, int& face_type) 
         return false;
     }
 
+    /* 低头和侧脸计算 */
+    double yaw = shapes[0].part(45).x() - shapes[0].part(36).x();
+    double pitch = shapes[0].part(8).y() - (shapes[0].part(27).y() + shapes[0].part(28).y()) / 2.0;
+    if (yaw < -20 || yaw > 20 || pitch > 10) 
+        std::cout << "(111111)" << std::endl;
+
     /* 系数 */
     float offset = -(faces[0].top() - faces[0].bottom()) / (float)OCSFS_FACE_MAX;
     

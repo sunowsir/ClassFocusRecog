@@ -25,6 +25,7 @@
 
 #include "ocsfs_module_trainer.h"
 #include "ocsfs_expression_recognition.h"
+#include "ocsfs_profileface_recognition.h"
 
 class OCSFS_Widget: public QWidget {
     Q_OBJECT
@@ -68,7 +69,10 @@ private:
     QTimer                                  *capture_timer;
 
     /* 表情识别器 */
-    OCSFS_Expression_Recognition              *ser;
+    OCSFS_Expression_Recognition            *ser;
+
+    /* 侧脸识别器 */
+    OCSFS_Profileface_Recognition           *opr;
 
 private: 
     
