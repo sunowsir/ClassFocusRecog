@@ -72,8 +72,6 @@ bool OCSFS_Face_Recognition::cv_recognize(cv::Mat &frame,
     std::vector<cv::Rect> cv_faces;
 
     /* 检测人脸 */
-    // this->faceDetector.detectMultiScale(gray, cv_faces, 
-    //     1.2, 2, 0 | cv::CASCADE_FIND_BIGGEST_OBJECT, cv::Size(30,30));
     this->faceDetector.detectMultiScale(gray, cv_faces);
     if (0 == cv_faces.size()) 
         qDebug() << "no face";

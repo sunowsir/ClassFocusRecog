@@ -1,12 +1,12 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QLocale>
 #include <QTranslator>
 
-#include "ocsfs_window.h"
+#include "ocsfs_server.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication start(argc, argv);
+    QCoreApplication start(argc, argv);
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -18,8 +18,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    OCSFS_Window ocsfs_window;
-    ocsfs_window.show();
+    OCSFS_Server serv;
 
     return start.exec();
 }
