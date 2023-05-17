@@ -9,7 +9,7 @@
 #include "ocsfs_server.h"
 
 OCSFS_Server::OCSFS_Server() {
-    this->clients = new QMap<QString, OCSFS_Client_Handler*>();
+    this->mgr_clients = new QMap<QString, OCSFS_Client_Handler*>();
 
     this->tcp_server = new QTcpServer(this);
     this->tcp_server->listen(QHostAddress::Any, OCSFS_SERVER_CTL_PORT);
@@ -19,18 +19,31 @@ OCSFS_Server::OCSFS_Server() {
 }
 
 OCSFS_Server::~OCSFS_Server() {
-    delete this->clients;
+    delete this->mgr_clients;
     delete this->tcp_server;
 }
 
 void OCSFS_Server::fetchSocket() {
     QTcpSocket *new_client = this->tcp_server->nextPendingConnection();
-
-    QString ip = new_client->peerAddress().toString();
-    qint16 port = new_client->peerPort();
-
-    QString map_key = ip + QString(port);
-
     OCSFS_Client_Handler *client = new OCSFS_Client_Handler(new_client);
-    this->clients->insert(map_key, client);
+
+    QObject::connect(client, SIGNAL(OCSFS_Client_Handler::mgr_client_ready), 
+        this, SLOT(mgr_client_ready()), Qt::AutoConnection);
+
+    QObject::connect(client, SIGNAL(OCSFS_Client_Handler::image_recognize_over), 
+        this, SLOT(send_recognize_result()), Qt::AutoConnection);
+}
+
+void OCSFS_Server::mgr_client_ready(OCSFS_Client_Handler *mgr_client) {
+    QString mgr_client_map_key;
+    mgr_client->get_map_key(mgr_client_map_key);
+    this->mgr_clients->insert(mgr_client_map_key, mgr_client);
+}
+
+/* 当学生端对象得到识别结果后，触发 image_recognize_over, 
+ * 调用如下槽函数，将识别结果以及对应学生端ID发送给教师端 */
+void OCSFS_Server::send_recognize_result(const QString &src_client_id, 
+    const QString &result) {
+    for (auto mgr_cli : *(this->mgr_clients)) 
+        mgr_cli->send_recognize_result(src_client_id, result);
 }

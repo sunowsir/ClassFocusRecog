@@ -29,14 +29,24 @@ OCSFS_Client_Handler::~OCSFS_Client_Handler() {
     delete this->socket;
 }
 
+bool OCSFS_Client_Handler::get_map_key(QString &map_key) {
+    map_key = this->ip + QString(this->port);
+    return true;
+}
+
+void OCSFS_Client_Handler::send_recognize_result(const QString& src_client_id, 
+    const QString& result) {
+    this->send_data(src_client_id, result);
+}
+
 /* 确认身份 */
 bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
     if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) 
-        this->send_data(QString("error"));
+        this->send_data(QString("0"), QString("error"));
 
     this->client_id = recv_data;
     this->step++;
-    this->send_data(QString("ack"));
+    this->send_data(QString("0"), QString("ack"));
 
     return this->parse_client_type_by_id();
 }
@@ -46,12 +56,12 @@ bool OCSFS_Client_Handler::step1_handler(QByteArray &recv_data) {
     // todo
     if (this->step != recv_data.toInt()) {
         this->step = 0;
-        this->send_data(QString("error"));
+        this->send_data(QString("0"), QString("error"));
         return true;
     }
 
     this->step++;
-    this->send_data(QString("ack"));
+    this->send_data(QString("0"), QString("ack"));
 
     return true;
 }
@@ -84,19 +94,30 @@ bool OCSFS_Client_Handler::step2_handler(QByteArray &recv_data) {
     face_type_str += "(" + QString::number(face_type) + ")";
     std::cout << this->client_id.toStdString() << ": " << face_type_str.toStdString() << std::endl;
 
-    return this->send_data(face_type_str);
+    /* 当处理完学生端发来的图片，得到状态结果后，
+     * 调用这个信号函数，把结果丢进去 */
+    this->image_recognize_over(this->client_id, face_type_str);
+
+    return true;
 }
 
 bool OCSFS_Client_Handler::parse_client_type_by_id() {
     // todo
+    /* 未完成：如何根据ID区分学生还是教师 */
+    
+    /* 当确认好身份后，如果是教师端，那么调用这个信号函数
+     * 将自己传递过去*/
+    if (OCSFS_CLIENT_TYPE_MGR == this->client_type)
+        this->mgr_client_ready(this);
     return true;
 }
 
-bool OCSFS_Client_Handler::send_data(const QString& send_data) {
-    QByteArray all_send_data;
+bool OCSFS_Client_Handler::send_data(const QString& src_client_id, const QString& send_data) {
+    QByteArray all_send_data = "";
 
-    all_send_data = QByteArray::fromRawData(this->client_id.toUtf8().data(), 
-        this->client_id.toUtf8().length());
+    all_send_data.append(src_client_id.toUtf8());
+
+    all_send_data.append(this->client_id.toUtf8());
 
     all_send_data.append((char*)&this->step, sizeof(int));
 
@@ -112,7 +133,7 @@ void OCSFS_Client_Handler::recv_data() {
 
     if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
-        this->send_data(QString("error"));
+        this->send_data(QString("0"), QString("error"));
     }
     
     recv_data += OCSFS_PROTO_HEAD_LEN;
@@ -133,4 +154,3 @@ void OCSFS_Client_Handler::recv_data() {
         };
     }
 }
-
