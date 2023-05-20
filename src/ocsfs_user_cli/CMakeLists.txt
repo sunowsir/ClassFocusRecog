@@ -24,10 +24,12 @@ add_executable(ocsfs_user_cli
     src/main.cpp
     src/ocsfs_window.cpp
     src/ocsfs_widget.cpp
+    src/ocsfs_login_widget.h
     src/ocsfs_module_trainer.cpp
     src/ocsfs_face_recognition.cpp
     src/ocsfs_image_converter.cpp
     src/ocsfs_expression_recognition.cpp
+    src/ocsfs_client.cpp
     ${TS_FILES}
 )
 

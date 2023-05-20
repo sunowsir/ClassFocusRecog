@@ -182,6 +182,8 @@ void OCSFS_Widget::slots_select_camera(const QString& selected_name) {
 }
 
 void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
+    this->send_image_to_server(frameImage);
+
 #if 0
     /* 使用图像训练器训练模型 */
     /* 设置有几种表情类型，以及每种类型的训练图片有多少 */

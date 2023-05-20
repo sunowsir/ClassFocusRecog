@@ -10,12 +10,12 @@
 #define _OCSFS_SERVER_H
 
 #include <QMap>
+#include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "ocsfs_define.h"
 #include "ocsfs_client_handler.h"
-
-#define OCSFS_SERVER_CTL_PORT 7890
 
 /* 服务器主类 */
 class OCSFS_Server : public QObject {

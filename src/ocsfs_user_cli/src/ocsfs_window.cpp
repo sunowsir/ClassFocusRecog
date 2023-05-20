@@ -14,12 +14,33 @@ OCSFS_Window::OCSFS_Window(QWidget *parent)
     this->resize(800, 600);
     this->setWindowTitle(tr("课堂状态监测系统演示程序"));
 
-    this->ssi_widget = new OCSFS_Widget(this);
-    setCentralWidget(this->ssi_widget);
-    
+    this->login_widget = new OCSFS_Login_Widget(this);
+    setCentralWidget(this->login_widget);
+
+    this->client_socket = new OCSFS_Client();
+
+    QObject::connect(this->login_widget, SIGNAL(OCSFS_Login_Widget::connect_to_server), 
+        this->client_socket, SLOT(OCSFS_Client::connect_to_server()), Qt::AutoConnection);
+    QObject::connect(this->login_widget, SIGNAL(OCSFS_Login_Widget::login_to_server), 
+        this->client_socket, SLOT(OCSFS_Client::login_to_server()), Qt::AutoConnection);
+    QObject::connect(this->client_socket, SIGNAL(OCSFS_Client::login_to_server_success), 
+        this, SLOT(login_to_server_success()), Qt::AutoConnection);
 }
 
 OCSFS_Window::~OCSFS_Window() {
-    this->ssi_widget->close();
-    delete this->ssi_widget;
+    this->login_widget->close();
+    delete this->login_widget;
+}
+
+/* 登陆成功，关闭登陆界面，打开主界面 */
+void OCSFS_Window::login_to_server_success() {
+    this->login_widget->close();
+    delete this->login_widget;
+    
+    this->ssi_widget = new OCSFS_Widget(this);
+    setCentralWidget(this->ssi_widget);
+    this->ssi_widget->show();
+
+    QObject::connect(this->ssi_widget, SIGNAL(OCSFS_Widget::send_image_to_server), 
+        this->client_socket, SLOT(OCSFS_Client::send_image_to_server()), Qt::AutoConnection);
 }

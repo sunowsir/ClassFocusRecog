@@ -1,5 +1,4 @@
-/*
-	* File     : ocsfs_widget.h
+/* File     : ocsfs_widget.h
 	* Author   : sunowsir
 	* Mail     : sunowsir@163.com
 	* Github   : github.com/sunowsir
@@ -77,6 +76,9 @@ private:
 public: 
     OCSFS_Widget(QMainWindow *parent = nullptr);
     ~OCSFS_Widget();
+
+signals: 
+    void send_image_to_server(const QImage&);
 
 public slots:
     void slots_open_camera();

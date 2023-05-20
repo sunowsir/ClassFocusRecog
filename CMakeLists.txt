@@ -19,6 +19,10 @@ find_package(OpenCV REQUIRED)
 # dlib
 find_package(dlib REQUIRED)
 
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src/include
+)
+
 add_subdirectory(src/ocsfs_serv)
 add_subdirectory(src/ocsfs_mgr_cli)
 # add_subdirectory(src/ocsfs_user_cli)
