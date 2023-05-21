@@ -48,9 +48,6 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->capture_timer = new QTimer(this);
     this->capture_timer->setInterval(300);
     this->capture_timer->stop();
-
-    /* 人脸识别器 */
-    this->ser = new OCSFS_Expression_Recognition(QCoreApplication::applicationDirPath() + QString("/SVM_DATA.xml"));
     
     /* connect signal with slot */
 
@@ -83,7 +80,6 @@ OCSFS_Widget::~OCSFS_Widget() {
     delete this->image_capture;
     delete this->camera_view;
     delete this->capture_timer;
-    delete this->ser;
     delete this->cameras_list;
     delete this->camera_combobox;
 
@@ -183,49 +179,6 @@ void OCSFS_Widget::slots_select_camera(const QString& selected_name) {
 
 void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
     this->send_image_to_server(frameImage);
-
-#if 0
-    /* 使用图像训练器训练模型 */
-    /* 设置有几种表情类型，以及每种类型的训练图片有多少 */
-    OCSFS_Module_Trainer smt(3, 50);
-    
-
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/comm"), OCSFS_face_COMM);
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/happy"), OCSFS_face_HAPPY);
-    smt.load_train_data(QCoreApplication::applicationDirPath() + QString("/hade"), OCSFS_face_HADE);
-
-    smt.train_module_2_xml();
-
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/comm"), OCSFS_face_COMM);
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/happy"), OCSFS_face_HAPPY);
-    smt.train_module_test(QCoreApplication::applicationDirPath() + QString("/hade"), OCSFS_face_HADE);
-
-    exit(0);
-#endif
-
-#if 1
-    int face_type = 0;
-    this->ser->recognize(frameImage, face_type);
-
-    std::cout << face_type << ": ";
-    switch(face_type) {
-        case OCSFS_face_COMM: {
-            std::cout << "平静" << std::endl;
-        } break;
-        case OCSFS_face_HAPPY: {
-            std::cout << "开心" << std::endl;
-        } break;
-        case OCSFS_face_HADE: {
-            std::cout << "厌恶" << std::endl;
-        } break;
-        default: {
-            std::cout << "unknow" << std::endl;
-        }
-    }
-
-#endif
-
-    return ;
 }
 
 void OCSFS_Widget::slots_timer_out() {

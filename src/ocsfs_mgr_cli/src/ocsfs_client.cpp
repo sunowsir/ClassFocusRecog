@@ -50,6 +50,16 @@ void OCSFS_Client::recv_date() {
         this->step = 0;
         this->send_data(QString("0"), QString("error"));
     }
+
+    int recv_data_idx = 0;
+    QString client_id = QString::fromUtf8(recv_data.mid(recv_data_idx, OCSFS_CLIENT_ID_LEN));
+    if (client_id != this->client_id) {
+        this->send_data(QString("0"), QString("error"));
+        qDebug() << "client_id error: " << client_id << ", this id: " << this->client_id;
+    }
+
+    recv_data_idx += OCSFS_CLIENT_ID_LEN;
+    QString src_client_id = QString::fromUtf8(recv_data.mid(recv_data_idx, OCSFS_CLIENT_ID_LEN));
     
     recv_data += OCSFS_PROTO_HEAD_LEN;
     
@@ -60,6 +70,9 @@ void OCSFS_Client::recv_date() {
         } break;
         case 1: {
             this->step1_handler(recv_data);
+        } break;
+        case 2: {
+            this->step2_handler(src_client_id, recv_data);
         } break;
         default: {
             qDebug() << "step error";
@@ -97,6 +110,11 @@ bool OCSFS_Client::step1_handler(QByteArray &recv_data) {
     return true;
 }
 
+bool OCSFS_Client::step2_handler(const QString &src_client_id, QByteArray &recv_data) {
+    this->recv_result_from_serv(src_client_id, recv_data);
+    return true;
+}
+
 void OCSFS_Client::connect_to_server(const QString &serv_ip) {
     this->serv_ip = serv_ip;
     this->socket->connectToHost(QHostAddress(this->serv_ip), OCSFS_SERVER_CTL_PORT);
@@ -107,13 +125,3 @@ void OCSFS_Client::login_to_server(const QString &client_id) {
     this->send_data(this->client_id, this->client_id);
 }
 
-void OCSFS_Client::send_image_to_server(const QImage &image) {
-    // 将QImage转换为QByteArray
-    QByteArray byteArray;
-    QBuffer buffer(&byteArray);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "JPG"); // 您可以使用其他格式
-    buffer.close();
-
-    this->send_data_by_byte(this->client_id, byteArray);
-}

@@ -22,9 +22,6 @@
 #include <QtMultimedia>
 #include <QMediaDevices>
 
-#include "ocsfs_module_trainer.h"
-#include "ocsfs_expression_recognition.h"
-
 class OCSFS_Widget: public QWidget {
     Q_OBJECT
 private: 
@@ -65,9 +62,6 @@ private:
 
     /* 定时器，用于定时采集摄像头图像 */
     QTimer                                  *capture_timer;
-
-    /* 表情识别器 */
-    OCSFS_Expression_Recognition              *ser;
 
 private: 
     

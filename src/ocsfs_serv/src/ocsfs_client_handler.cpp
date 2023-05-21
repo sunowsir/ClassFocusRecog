@@ -53,7 +53,6 @@ bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
 
 /* 准备 */
 bool OCSFS_Client_Handler::step1_handler(QByteArray &recv_data) {
-    // todo
     if (this->step != recv_data.toInt()) {
         this->step = 0;
         this->send_data(QString("0"), QString("error"));

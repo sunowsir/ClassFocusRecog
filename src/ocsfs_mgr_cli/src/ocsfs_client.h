@@ -40,6 +40,7 @@ private:
     bool send_data_by_byte(const QString&, const QByteArray&);
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
+    bool step2_handler(const QString&, QByteArray&);
 
 public: 
     OCSFS_Client();
@@ -48,12 +49,12 @@ public:
 signals: 
     void login_to_server_success();
     void login_to_server_failed();
+    void recv_result_from_serv(const QString&, const QString&);
     
 public slots: 
     void recv_date();
     void connect_to_server(const QString&);
     void login_to_server(const QString&);
-    void send_image_to_server(const QImage&);
 };
 
 #endif

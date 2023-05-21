@@ -23,12 +23,10 @@ include_directories(
 add_executable(ocsfs_mgr_cli
     src/main.cpp
     src/ocsfs_window.cpp
+    src/ocsfs_connect_widget.cpp
+    src/ocsfs_login_widget.cpp
     src/ocsfs_widget.cpp
-    src/ocsfs_module_trainer.cpp
-    src/ocsfs_face_recognition.cpp
-    src/ocsfs_image_converter.cpp
-    src/ocsfs_expression_recognition.cpp
-    src/ocsfs_profileface_recognition.cpp
+    src/ocsfs_client.cpp
     ${TS_FILES}
 )
 

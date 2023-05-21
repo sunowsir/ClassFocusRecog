@@ -25,7 +25,7 @@ include_directories(
 
 add_subdirectory(src/ocsfs_serv)
 add_subdirectory(src/ocsfs_mgr_cli)
-# add_subdirectory(src/ocsfs_user_cli)
+add_subdirectory(src/ocsfs_user_cli)
 # add_subdirectory(src/module_train_tool)
 # add_subdirectory(src/demo)
 
