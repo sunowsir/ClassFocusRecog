@@ -10,6 +10,7 @@
 #define OCSFS_WINDOW_H
 
 #include <QWidget>
+#include <QImage>
 #include <QTcpSocket>
 #include <QMainWindow>
 

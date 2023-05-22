@@ -9,9 +9,13 @@
 #include "ocsfs_client_handler.h"
 
 OCSFS_Client_Handler::OCSFS_Client_Handler(QTcpSocket *socket) {
-    this->socket = new QTcpSocket(socket);
+    this->socket = socket;
     this->ip = this->socket->peerAddress().toString();
     this->port = this->socket->peerPort();
+    this->step = 0;
+    this->client_id = QString(OCSFS_CLIENT_ID_LEN, '0');
+
+    qDebug() << "ip: " << this->ip << ", port: " << this->port;
 
     /* 人脸识别器 */
     this->ser = new OCSFS_Expression_Recognition(QCoreApplication::applicationDirPath() + 
@@ -21,7 +25,7 @@ OCSFS_Client_Handler::OCSFS_Client_Handler(QTcpSocket *socket) {
     this->opr = new OCSFS_Profileface_Recognition(QCoreApplication::applicationDirPath() + 
         QString("/haarcascade_profileface.xml"));
 
-    QObject::connect(this->socket, SIGNAL(QTcpServer::readyRead), 
+    QObject::connect(this->socket, SIGNAL(readyRead()), 
         this, SLOT(recv_data()), Qt::AutoConnection);
 }
 
@@ -41,12 +45,10 @@ void OCSFS_Client_Handler::send_recognize_result(const QString& src_client_id,
 
 /* 确认身份 */
 bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
-    if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) 
-        this->send_data(QString("0"), QString("error"));
-
-    this->client_id = recv_data;
+    this->client_id = QString(recv_data);
+    qDebug() << this->client_id << ": step 0 ok";
     this->step++;
-    this->send_data(QString("0"), QString("ack"));
+    this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("ack"));
 
     return this->parse_client_type_by_id();
 }
@@ -55,12 +57,12 @@ bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
 bool OCSFS_Client_Handler::step1_handler(QByteArray &recv_data) {
     if (this->step != recv_data.toInt()) {
         this->step = 0;
-        this->send_data(QString("0"), QString("error"));
+        this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("error"));
         return true;
     }
 
     this->step++;
-    this->send_data(QString("0"), QString("ack"));
+    this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("ack"));
 
     return true;
 }
@@ -122,22 +124,26 @@ bool OCSFS_Client_Handler::send_data(const QString& src_client_id, const QString
 
     int data_len = send_data.size();
     all_send_data.append((char*)&data_len, sizeof(int));
+    qDebug() << "head len: " << all_send_data.size();
     all_send_data.append(send_data.toUtf8());
 
+    qDebug() << "will send data len: " << all_send_data.size();
     return this->socket->write(all_send_data);
 }
 
 void OCSFS_Client_Handler::recv_data() {
     QByteArray recv_data  = this->socket->readAll();
 
+    qDebug() << "recv data.";
+
     if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
-        this->send_data(QString("0"), QString("error"));
+        this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("error"));
+        qDebug() << "data len error: " << recv_data.size();
     }
     
-    recv_data += OCSFS_PROTO_HEAD_LEN;
+    recv_data.remove(0, OCSFS_PROTO_HEAD_LEN);
     
-
     switch (this->step) {
         case 0: {
             this->step0_handler(recv_data);

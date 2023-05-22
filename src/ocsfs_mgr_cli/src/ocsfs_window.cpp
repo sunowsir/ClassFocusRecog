@@ -17,6 +17,9 @@ OCSFS_Window::OCSFS_Window(QWidget *parent)
     this->connect_widget = new OCSFS_Connect_Widget(this);
     setCentralWidget(this->connect_widget);
 
+    this->login_widget = nullptr;
+    this->ssi_widget = nullptr;
+
     this->client_socket = new OCSFS_Client();
 
     /* 按下连接按钮 */
@@ -33,8 +36,20 @@ OCSFS_Window::OCSFS_Window(QWidget *parent)
 }
 
 OCSFS_Window::~OCSFS_Window() {
-    this->ssi_widget->close();
-    delete this->ssi_widget;
+    if (nullptr != this->connect_widget) {
+        this->connect_widget->close();
+        delete this->connect_widget;
+    }
+
+    if (nullptr != this->login_widget) {
+        this->login_widget->close();
+        delete this->login_widget;
+    }
+
+    if (nullptr != this->ssi_widget) {
+        this->ssi_widget->close();
+        delete this->ssi_widget;
+    }
 }
 
 /* 连接成功，关闭连接界面，打开登陆界面 */

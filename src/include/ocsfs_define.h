@@ -12,8 +12,8 @@
 #define OCSFS_CLIENT_TYPE_USER 0
 #define OCSFS_CLIENT_TYPE_MGR  1
 
-/* 暂时规定客户端ID长度为64 */
-#define OCSFS_CLIENT_ID_LEN    64
+/* 暂时规定客户端ID长度为10 */
+#define OCSFS_CLIENT_ID_LEN    10
 
 /* 规定，协议头：client_id(64), src_client_id(64), step(int), data len(int) */
 #define OCSFS_PROTO_HEAD_LEN   (OCSFS_CLIENT_ID_LEN * 2 + sizeof(int) * 2)

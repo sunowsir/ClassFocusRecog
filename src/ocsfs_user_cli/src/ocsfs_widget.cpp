@@ -80,7 +80,8 @@ OCSFS_Widget::~OCSFS_Widget() {
     delete this->image_capture;
     delete this->camera_view;
     delete this->capture_timer;
-    delete this->cameras_list;
+    if (nullptr != this->cameras_list)
+        delete this->cameras_list;
     delete this->camera_combobox;
 
     return ;

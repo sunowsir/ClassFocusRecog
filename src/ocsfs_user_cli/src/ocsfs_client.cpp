@@ -8,13 +8,19 @@
 
 #include "ocsfs_client.h"
 
-OCSFS_Client::OCSFS_Client() {
+OCSFS_Client::OCSFS_Client(QMainWindow *mainwindow) {
+    this->mainwindow = mainwindow;
     this->socket = new QTcpSocket(this);
-    this->client_id = 0;
+    this->client_id = QString(OCSFS_CLIENT_ID_LEN, '0');
     this->step = 0;
     this->serv_ip = "";
 
-    QObject::connect(this->socket, SIGNAL(QTcpServer::readyRead), 
+
+    /* 连接成功 */
+    QObject::connect(this->socket, SIGNAL(connected()), 
+        this->mainwindow, SLOT(connect_to_server_success()), Qt::AutoConnection);
+
+    QObject::connect(this->socket, SIGNAL(readyRead()), 
         this, SLOT(recv_data()), Qt::AutoConnection);
 }
 
@@ -38,20 +44,22 @@ bool OCSFS_Client::send_data_by_byte(const QString &src_client_id,
 
     int data_len = send_data.size();
     all_send_data.append((char*)&data_len, sizeof(int));
+    qDebug() << "head len: " << all_send_data.size();
     all_send_data.append(send_data);
 
+    qDebug() << "will send data len: " << all_send_data.size();
     return this->socket->write(all_send_data);
 }
 
-void OCSFS_Client::recv_date() {
+void OCSFS_Client::recv_data() {
     QByteArray recv_data  = this->socket->readAll();
 
     if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
-        this->send_data(QString("0"), QString("error"));
+        this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("error"));
     }
     
-    recv_data += OCSFS_PROTO_HEAD_LEN;
+    recv_data.remove(0, OCSFS_PROTO_HEAD_LEN);
     
     /* 处理服务器发来的消息 */
     switch (this->step) {
@@ -70,7 +78,7 @@ void OCSFS_Client::recv_date() {
 bool OCSFS_Client::step0_handler(QByteArray &recv_data) {
     if (QString(recv_data) != "ack") {
         this->login_to_server_failed();
-        qDebug() << "step 0 failed.";
+        qDebug() << "step 0 failed: " << recv_data << ".";
         return false;
     } 
 
@@ -98,11 +106,13 @@ bool OCSFS_Client::step1_handler(QByteArray &recv_data) {
 }
 
 void OCSFS_Client::connect_to_server(const QString &serv_ip) {
+    qDebug() << "connect to " << serv_ip;
     this->serv_ip = serv_ip;
     this->socket->connectToHost(QHostAddress(this->serv_ip), OCSFS_SERVER_CTL_PORT);
 }
 
 void OCSFS_Client::login_to_server(const QString &client_id) {
+    qDebug() << "login to server, client_id: " << client_id;
     this->client_id = client_id;
     this->send_data(this->client_id, this->client_id);
 }

@@ -18,17 +18,17 @@ OCSFS_Connect_Widget::OCSFS_Connect_Widget(QMainWindow *parent) {
     this->parent = parent;
 
     this->connect_label = new QLabel(this);
-    this->connect_label->setText(tr("ID"));
-    this->connect_label->move(300, 150);
+    this->connect_label->setText(tr("服务器IP"));
+    this->connect_label->move(200, 150);
     this->connect_label->resize(100, 30);
 
     this->connect_input = new QLineEdit(this);
-    this->connect_input->move(360, 145);
+    this->connect_input->move(260, 145);
     this->connect_input->resize(150, 30);
 
     this->connect = new QPushButton(this);
     this->connect->setText(tr("连接"));
-    this->connect->move(360, 385);
+    this->connect->move(260, 385);
 
     this->serv_ip = new QString();
 

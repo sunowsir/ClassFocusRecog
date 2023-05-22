@@ -15,12 +15,15 @@
 #include <QBuffer>
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QMainWindow>
 
 #include "ocsfs_define.h"
 
 class OCSFS_Client : public QObject {
 private:
     Q_OBJECT
+
+    QMainWindow *mainwindow;
     
     QTcpSocket  *socket;
 
@@ -42,7 +45,7 @@ private:
     bool step1_handler(QByteArray &recv_data);
 
 public: 
-    OCSFS_Client();
+    OCSFS_Client(QMainWindow *mainwindow = nullptr);
     ~OCSFS_Client();
 
 signals: 
@@ -50,7 +53,7 @@ signals:
     void login_to_server_failed();
     
 public slots: 
-    void recv_date();
+    void recv_data();
     void connect_to_server(const QString&);
     void login_to_server(const QString&);
     void send_image_to_server(const QImage&);

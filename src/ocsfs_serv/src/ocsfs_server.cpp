@@ -14,7 +14,7 @@ OCSFS_Server::OCSFS_Server() {
     this->tcp_server = new QTcpServer(this);
     this->tcp_server->listen(QHostAddress::Any, OCSFS_SERVER_CTL_PORT);
 
-    QObject::connect(this->tcp_server, SIGNAL(QTcpServer::newConnection), 
+    QObject::connect(this->tcp_server, SIGNAL(newConnection()), 
         this, SLOT(fetchSocket()), Qt::AutoConnection);
 }
 
@@ -24,14 +24,15 @@ OCSFS_Server::~OCSFS_Server() {
 }
 
 void OCSFS_Server::fetchSocket() {
+    qDebug() << "new client connect to server.";
     QTcpSocket *new_client = this->tcp_server->nextPendingConnection();
     OCSFS_Client_Handler *client = new OCSFS_Client_Handler(new_client);
 
-    QObject::connect(client, SIGNAL(OCSFS_Client_Handler::mgr_client_ready), 
-        this, SLOT(mgr_client_ready()), Qt::AutoConnection);
+    QObject::connect(client, SIGNAL(mgr_client_ready(OCSFS_Client_Handler*)), 
+        this, SLOT(mgr_client_ready(OCSFS_Client_Handler*)), Qt::AutoConnection);
 
-    QObject::connect(client, SIGNAL(OCSFS_Client_Handler::image_recognize_over), 
-        this, SLOT(send_recognize_result()), Qt::AutoConnection);
+    QObject::connect(client, SIGNAL(image_recognize_over(const QString&, const QString&)), 
+        this, SLOT(send_recognize_result(const QString&, const QString&)), Qt::AutoConnection);
 }
 
 void OCSFS_Server::mgr_client_ready(OCSFS_Client_Handler *mgr_client) {
@@ -44,6 +45,11 @@ void OCSFS_Server::mgr_client_ready(OCSFS_Client_Handler *mgr_client) {
  * 调用如下槽函数，将识别结果以及对应学生端ID发送给教师端 */
 void OCSFS_Server::send_recognize_result(const QString &src_client_id, 
     const QString &result) {
+
+    // todo
+    qDebug() << "[DEBUG] send to server";
+    return ;
+
     for (auto mgr_cli : *(this->mgr_clients)) 
         mgr_cli->send_recognize_result(src_client_id, result);
 }

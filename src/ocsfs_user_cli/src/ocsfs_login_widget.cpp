@@ -35,6 +35,7 @@ OCSFS_Login_Widget::OCSFS_Login_Widget(QMainWindow *parent) {
 
     QWidget::connect(this->account_input, SIGNAL(textChanged(QString)), 
         this, SLOT(account_input_change(const QString&)), Qt::AutoConnection);
+
     QWidget::connect(this->login, SIGNAL(released()), 
         this, SLOT(login_button_released()), Qt::AutoConnection);
 }
@@ -58,6 +59,8 @@ void OCSFS_Login_Widget::login_button_released() {
         QMessageBox::warning(this, tr("警告"), tr("ID 输入错误"));
         return ;
     }
+
+    qDebug() << "push login button";
     
     /* 向服务器发送确认 */
     this->login_to_server(*this->account);
