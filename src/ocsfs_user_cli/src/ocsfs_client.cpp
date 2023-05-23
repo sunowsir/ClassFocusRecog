@@ -40,14 +40,12 @@ bool OCSFS_Client::send_data_by_byte(const QString &src_client_id,
 
     all_send_data.append(this->client_id.toUtf8());
 
-    all_send_data.append((char*)&this->step, sizeof(int));
+    all_send_data.append((char*)&this->step, 1);
 
     int data_len = send_data.size();
     all_send_data.append((char*)&data_len, sizeof(int));
-    qDebug() << "head len: " << all_send_data.size();
     all_send_data.append(send_data);
 
-    qDebug() << "will send data len: " << all_send_data.size();
     return this->socket->write(all_send_data);
 }
 
@@ -86,8 +84,10 @@ bool OCSFS_Client::step0_handler(QByteArray &recv_data) {
     this->login_to_server_success();
     this->step++;
 
+    qDebug() << "登陆成功, step: " << this->step;
+
     /* 发送step，向服务器握手，进入第一步 */
-    this->send_data(this->client_id, QString(this->step));
+    this->send_data(this->client_id, QString(static_cast<QChar>(this->step)));
 
     return true;
 }
@@ -102,17 +102,19 @@ bool OCSFS_Client::step1_handler(QByteArray &recv_data) {
     /* 握手成功，进入第二步 */
     this->step++;
 
+    qDebug() << "握手成功，step: " << this->step;
+
     return true;
 }
 
 void OCSFS_Client::connect_to_server(const QString &serv_ip) {
-    qDebug() << "connect to " << serv_ip;
+    qDebug() << "连接服务器： " << serv_ip;
     this->serv_ip = serv_ip;
     this->socket->connectToHost(QHostAddress(this->serv_ip), OCSFS_SERVER_CTL_PORT);
 }
 
 void OCSFS_Client::login_to_server(const QString &client_id) {
-    qDebug() << "login to server, client_id: " << client_id;
+    qDebug() << "准备登陆, 用户ID: " << client_id;
     this->client_id = client_id;
     this->send_data(this->client_id, this->client_id);
 }

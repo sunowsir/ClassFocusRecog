@@ -60,8 +60,6 @@ void OCSFS_Login_Widget::login_button_released() {
         return ;
     }
 
-    qDebug() << "push login button";
-    
     /* 向服务器发送确认 */
     this->login_to_server(*this->account);
 }

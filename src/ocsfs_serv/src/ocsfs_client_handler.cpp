@@ -34,7 +34,7 @@ OCSFS_Client_Handler::~OCSFS_Client_Handler() {
 }
 
 bool OCSFS_Client_Handler::get_map_key(QString &map_key) {
-    map_key = this->ip + QString(this->port);
+    map_key = this->ip + QString(static_cast<QChar>(this->port));
     return true;
 }
 
@@ -46,7 +46,7 @@ void OCSFS_Client_Handler::send_recognize_result(const QString& src_client_id,
 /* 确认身份 */
 bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
     this->client_id = QString(recv_data);
-    qDebug() << this->client_id << ": step 0 ok";
+    qDebug() << this->client_id << " 登陆成功";
     this->step++;
     this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("ack"));
 
@@ -55,7 +55,10 @@ bool OCSFS_Client_Handler::step0_handler(QByteArray &recv_data) {
 
 /* 准备 */
 bool OCSFS_Client_Handler::step1_handler(QByteArray &recv_data) {
-    if (this->step != recv_data.toInt()) {
+    bool ret = true;
+    if (this->step != recv_data.toHex().toInt(&ret, 10)) {
+        if (!ret)
+            qDebug() << "step1 toInt false";
         this->step = 0;
         this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("error"));
         return true;
@@ -63,6 +66,7 @@ bool OCSFS_Client_Handler::step1_handler(QByteArray &recv_data) {
 
     this->step++;
     this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("ack"));
+    qDebug() << this->client_id << " 握手成功";
 
     return true;
 }
@@ -77,23 +81,23 @@ bool OCSFS_Client_Handler::step2_handler(QByteArray &recv_data) {
     QString face_type_str = "result: ";
     switch(face_type) {
         case OCSFS_face_COMM: {
-            face_type_str += "calm";
+            face_type_str += "平静";
         } break;
         case OCSFS_face_HAPPY: {
-            face_type_str += "happy";
+            face_type_str += "高兴";
         } break;
         case OCSFS_face_HADE: {
-            face_type_str += "hade";
+            face_type_str += "厌恶";
         } break;
         default: {
             if (this->opr->recognize(recv_image))
-                face_type_str += "profile";
+                face_type_str += "侧脸";
             else 
                 face_type_str += "unknow";
         }
     }
     face_type_str += "(" + QString::number(face_type) + ")";
-    std::cout << this->client_id.toStdString() << ": " << face_type_str.toStdString() << std::endl;
+    qDebug() << "服务器识别结果：" << this->client_id << ": " << face_type_str;
 
     /* 当处理完学生端发来的图片，得到状态结果后，
      * 调用这个信号函数，把结果丢进去 */
@@ -120,21 +124,17 @@ bool OCSFS_Client_Handler::send_data(const QString& src_client_id, const QString
 
     all_send_data.append(this->client_id.toUtf8());
 
-    all_send_data.append((char*)&this->step, sizeof(int));
+    all_send_data.append((char*)&this->step, 1);
 
     int data_len = send_data.size();
     all_send_data.append((char*)&data_len, sizeof(int));
-    qDebug() << "head len: " << all_send_data.size();
     all_send_data.append(send_data.toUtf8());
 
-    qDebug() << "will send data len: " << all_send_data.size();
     return this->socket->write(all_send_data);
 }
 
 void OCSFS_Client_Handler::recv_data() {
     QByteArray recv_data  = this->socket->readAll();
-
-    qDebug() << "recv data.";
 
     if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;

@@ -50,10 +50,11 @@ OCSFS_Window::~OCSFS_Window() {
 
 /* 连接成功，关闭连接界面，打开登陆界面 */
 void OCSFS_Window::connect_to_server_success() {
-    qDebug() << "connect server success!";
+    qDebug() << "连接服务器成功!";
 
     this->connect_widget->close();
     delete this->connect_widget;
+    this->connect_widget = nullptr;
 
     this->login_widget = new OCSFS_Login_Widget(this);
     setCentralWidget(this->login_widget);
@@ -66,6 +67,7 @@ void OCSFS_Window::connect_to_server_success() {
 void OCSFS_Window::login_to_server_success() {
     this->login_widget->close();
     delete this->login_widget;
+    this->login_widget = nullptr;
     
     this->ssi_widget = new OCSFS_Widget(this);
     setCentralWidget(this->ssi_widget);

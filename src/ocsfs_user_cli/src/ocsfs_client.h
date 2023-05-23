@@ -34,7 +34,7 @@ private:
      * 1: 准备确认
      * 2：工作中，传输正式工作数据
      * */
-    qint16       step;
+    uint8_t       step;
 
     QString     serv_ip;
 

@@ -64,8 +64,10 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->camera_combobox = new QComboBox(this);
     this->camera_combobox->move(30, 520);
     this->camera_combobox->resize(190, 30);
+
     /* 获取摄像头设备列表信息 */
     this->camera_devices_refresh();
+
     QWidget::connect(this->camera_combobox, SIGNAL(currentTextChanged(const QString&)), 
         this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
 

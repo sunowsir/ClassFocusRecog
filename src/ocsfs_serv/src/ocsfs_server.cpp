@@ -47,7 +47,7 @@ void OCSFS_Server::send_recognize_result(const QString &src_client_id,
     const QString &result) {
 
     // todo
-    qDebug() << "[DEBUG] send to server";
+    qDebug() << "[DEBUG] receive image from " << src_client_id;
     return ;
 
     for (auto mgr_cli : *(this->mgr_clients)) 

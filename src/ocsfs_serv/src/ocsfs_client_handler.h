@@ -26,7 +26,7 @@ private:
     
     QString      ip;
 
-    qint16       port;
+    int       port;
 
     QTcpSocket   *socket;
 
@@ -34,14 +34,14 @@ private:
     QString      client_id;
 
     /* 客户端类型 */
-    qint8        client_type;
+    uint8_t        client_type;
 
     /* 
      * 0: 确认客户端类型，接收ID
      * 1: 准备确认
      * 2：工作中，传输正式工作数据
      * */
-    qint16       step;
+    uint8_t       step;
 
 
     /* 表情识别器 */
