@@ -18,6 +18,7 @@
 /* 规定，协议头：client_id(64), src_client_id(64), step(1), data len(int) */
 #define OCSFS_PROTO_HEAD_LEN   (OCSFS_CLIENT_ID_LEN * 2 + 1 + sizeof(int))
 
+/* 服务器端口 */
 #define OCSFS_SERVER_CTL_PORT 7890
 
 #endif

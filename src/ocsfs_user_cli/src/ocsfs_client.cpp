@@ -20,6 +20,11 @@ OCSFS_Client::OCSFS_Client(QMainWindow *mainwindow) {
     QObject::connect(this->socket, SIGNAL(connected()), 
         this->mainwindow, SLOT(connect_to_server_success()), Qt::AutoConnection);
 
+    /* 断开连接 */
+    QObject::connect(this->socket, SIGNAL(disconnected()), 
+        this->mainwindow, SLOT(disconnected_from_server()), Qt::AutoConnection);
+
+    /* 接收到数据 */
     QObject::connect(this->socket, SIGNAL(readyRead()), 
         this, SLOT(recv_data()), Qt::AutoConnection);
 }
@@ -95,7 +100,8 @@ bool OCSFS_Client::step0_handler(QByteArray &recv_data) {
 bool OCSFS_Client::step1_handler(QByteArray &recv_data) {
     if (QString(recv_data) != "ack") {
         this->step = 0;
-        qDebug() << "step 1 failed.";
+        qDebug() << "握手失败，需重新登陆";
+        this->handshake_failed();
         return false;
     }
 

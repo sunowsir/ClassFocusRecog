@@ -29,22 +29,34 @@ OCSFS_Window::OCSFS_Window(QWidget *parent)
     /* 登陆成功 */
     QObject::connect(this->client_socket, SIGNAL(login_to_server_success()), 
         this, SLOT(login_to_server_success()), Qt::AutoConnection);
+
+    /* 握手失败 */
+    QObject::connect(this->client_socket, SIGNAL(handshake_failed()), 
+        this, SLOT(handshake_failed()), Qt::AutoConnection);
 }
 
 OCSFS_Window::~OCSFS_Window() {
     if (nullptr != this->connect_widget) {
         this->connect_widget->close();
         delete this->connect_widget;
+        this->connect_widget = nullptr;
     }
 
     if (nullptr != this->login_widget) {
         this->login_widget->close();
         delete this->login_widget;
+        this->login_widget = nullptr;
     }
 
     if (nullptr != this->ssi_widget) {
         this->ssi_widget->close();
         delete this->ssi_widget;
+        this->ssi_widget = nullptr;
+    }
+
+    if (nullptr != this->client_socket) {
+        delete this->client_socket;
+        this->client_socket = nullptr;
     }
 }
 
@@ -63,6 +75,38 @@ void OCSFS_Window::connect_to_server_success() {
         this->client_socket, SLOT(login_to_server(const QString&)), Qt::AutoConnection);
 }
 
+/* 断开连接 */
+void OCSFS_Window::disconnected_from_server() {
+    qDebug() << "与服务器断开连接";
+
+    if (nullptr != this->connect_widget) {
+        this->connect_widget->close();
+        delete this->connect_widget;
+        this->connect_widget = nullptr;
+    }
+
+    if (nullptr != this->login_widget) {
+        this->login_widget->close();
+        delete this->login_widget;
+        this->login_widget = nullptr;
+    }
+
+    if (nullptr != this->ssi_widget) {
+        this->ssi_widget->close();
+        delete this->ssi_widget;
+        this->ssi_widget = nullptr;
+    }
+
+    this->connect_widget = new OCSFS_Connect_Widget(this);
+    setCentralWidget(this->connect_widget);
+
+
+    /* 按下连接按钮 */
+    QObject::connect(this->connect_widget, SIGNAL(connect_to_server(const QString&)), 
+        this->client_socket, SLOT(connect_to_server(const QString&)), Qt::AutoConnection);
+    
+}
+
 /* 登陆成功，关闭登陆界面，打开主界面 */
 void OCSFS_Window::login_to_server_success() {
     this->login_widget->close();
@@ -74,4 +118,17 @@ void OCSFS_Window::login_to_server_success() {
 
     QObject::connect(this->ssi_widget, SIGNAL(send_image_to_server(const QImage&)), 
         this->client_socket, SLOT(send_image_to_server(const QImage&)), Qt::AutoConnection);
+}
+
+/* 握手失败 */
+void OCSFS_Window::handshake_failed() {
+    this->ssi_widget->close();
+    delete this->ssi_widget;
+    this->ssi_widget = nullptr;
+
+    this->login_widget = new OCSFS_Login_Widget(this);
+    setCentralWidget(this->login_widget);
+
+    QObject::connect(this->login_widget, SIGNAL(login_to_server(const QString&)), 
+        this->client_socket, SLOT(login_to_server(const QString&)), Qt::AutoConnection);
 }

@@ -40,7 +40,9 @@ public:
 
 public slots: 
     void connect_to_server_success();
+    void disconnected_from_server();
     void login_to_server_success();
+    void handshake_failed();
 };
 
 #endif

@@ -51,6 +51,7 @@ public:
 signals: 
     void login_to_server_success();
     void login_to_server_failed();
+    void handshake_failed();
     
 public slots: 
     void recv_data();

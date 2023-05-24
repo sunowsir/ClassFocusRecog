@@ -17,6 +17,8 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+#include "ocsfs_define.h"
+
 /* 登陆界面 */
 class OCSFS_Login_Widget : public QWidget {
 private: 

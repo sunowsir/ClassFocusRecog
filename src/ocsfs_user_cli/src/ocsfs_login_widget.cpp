@@ -9,8 +9,9 @@
 #include "ocsfs_login_widget.h"
 
 bool OCSFS_Login_Widget::account_check() {
-    /* todo */
     /* 账号检查 */
+    if (this->account->size() != OCSFS_CLIENT_ID_LEN)
+        return false;
     return true;
 }
 
