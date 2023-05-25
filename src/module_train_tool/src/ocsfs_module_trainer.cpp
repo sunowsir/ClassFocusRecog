@@ -8,7 +8,7 @@
 
 #include "ocsfs_module_trainer.h"
 
-bool OCSFS_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, int& trans_mat_row) {
+bool OCSFS_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, unsigned int& trans_mat_row) {
     /* 一系列人脸所在区域 */
     std::vector<dlib::rectangle> faces;
 
@@ -83,11 +83,9 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
         return false;
     }
 
-    int row = (this->type_num * this->img_num);
-
     int img_idx_start = (face_type - OCSFS_FACE_BASE) / OCSFS_FACE_STEP  * this->img_num;
 
-    for (int i = img_idx_start; i < img_idx_start + this->img_num; i++) {
+    for (unsigned int i = img_idx_start; i < img_idx_start + this->img_num; i++) {
         int* pixel_ptr = this->trans_label->ptr<int>(i);
         *pixel_ptr = face_type;
     }
@@ -108,7 +106,7 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
     }
     std::cout << ": {" << std::endl;
 
-    int img_idx = img_idx_start;
+    unsigned int img_idx = img_idx_start;
 
     /* 遍历目录中的所有文件 (code from ChatGPT) */
     for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
@@ -139,8 +137,6 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
 }
 
 bool OCSFS_Module_Trainer::train_module_2_xml() {
-    int row = (this->type_num * this->img_num);
-
     /* 构造svm对象 */
     cv::Ptr<ns_CVML::SVM> svm = ns_CVML::SVM::create();
 

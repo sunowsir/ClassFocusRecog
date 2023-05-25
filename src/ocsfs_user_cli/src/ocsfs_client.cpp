@@ -57,7 +57,7 @@ bool OCSFS_Client::send_data_by_byte(const QString &src_client_id,
 void OCSFS_Client::recv_data() {
     QByteArray recv_data  = this->socket->readAll();
 
-    if (recv_data.size() < OCSFS_PROTO_HEAD_LEN) {
+    if (recv_data.size() < (long long int)OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
         this->send_data(QString(OCSFS_CLIENT_ID_LEN, '0'), QString("error"));
     }

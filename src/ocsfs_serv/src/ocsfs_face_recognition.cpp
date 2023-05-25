@@ -45,7 +45,7 @@ bool OCSFS_Face_Recognition::dlib_recognize(cv::Mat &frame,
     }
 
     /* 获取人脸特征点分布 */
-    for (int i = 0; i < dlib_faces.size(); i++) {
+    for (int i = 0; i < (int)dlib_faces.size(); i++) {
         /* 获取指定一个区域的人脸形状 */
         dlib::full_object_detection shape = this->sp(dimg, dlib_faces[i]); 
         shapes.push_back(shape); 

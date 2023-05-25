@@ -25,14 +25,7 @@
 
 #include "ocsfs_image_converter.h"
 #include "ocsfs_face_recognition.h"
-
-
-#define OCSFS_FACE_BASE       (100)
-#define OCSFS_FACE_STEP       (50)
-#define OCSFS_face_COMM       (OCSFS_FACE_BASE + 0 * OCSFS_FACE_STEP)
-#define OCSFS_face_HAPPY      (OCSFS_FACE_BASE + 1 * OCSFS_FACE_STEP)
-#define OCSFS_face_HADE       (OCSFS_FACE_BASE + 2 * OCSFS_FACE_STEP)
-#define OCSFS_FACE_MAX        (OCSFS_FACE_BASE + 2 * OCSFS_FACE_STEP)
+#include "ocsfs_define.h"
 
 
 namespace ns_fs = std::filesystem;
