@@ -9,10 +9,14 @@
 #ifndef _OCSFS_CLIENT_H
 #define _OCSFS_CLIENT_H
 
+#include <string>
+#include <iostream>
+
 #include <QImage>
 #include <QObject>
 #include <QString>
 #include <QBuffer>
+#include <QtEndian>
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QMainWindow>
@@ -39,10 +43,12 @@ private:
     QString     serv_ip;
 
 private:
-    bool send_data(const QString&, const QString&);
-    bool send_data_by_byte(const QString&, const QByteArray&);
+    bool send_data(const QString&, const QString&, const QString&);
+    bool send_data_by_byte(const QString&, const QString&, const QByteArray&);
+    bool parse_data(QString&, QString&, const QByteArray&, QByteArray&, int&);
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
+    bool step2_handler(QString src_client_id, QByteArray &recv_data);
 
 public: 
     OCSFS_Client(QMainWindow *mainwindow = nullptr);
@@ -52,12 +58,17 @@ signals:
     void login_to_server_success();
     void login_to_server_failed();
     void handshake_failed();
+    void have_user_check_in(QString &);
+    void have_user_roll_call(QString &);
+    void have_user_warning_res(QString &);
+    void have_user_status(int);
+    void have_user_status_image(QString&, QImage&);
+    void have_user_ready(QString&);
     
 public slots: 
     void recv_data();
     void connect_to_server(const QString&);
     void login_to_server(const QString&);
-    void send_image_to_server(const QImage&);
 };
 
 #endif

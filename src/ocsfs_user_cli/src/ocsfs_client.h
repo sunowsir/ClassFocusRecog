@@ -39,10 +39,11 @@ private:
     QString     serv_ip;
 
 private:
-    bool send_data(const QString&, const QString&);
-    bool send_data_by_byte(const QString&, const QByteArray&);
+    bool send_data(const QString&, const QString&, const QString&);
+    bool send_data_by_byte(const QString&, const QString&, const QByteArray&);
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
+    bool step2_handler(const QString&, QByteArray &recv_data);
 
 public: 
     OCSFS_Client(QMainWindow *mainwindow = nullptr);
@@ -52,12 +53,20 @@ signals:
     void login_to_server_success();
     void login_to_server_failed();
     void handshake_failed();
+
+    void have_mgr_check_in(const QString&);
+    void have_mgr_roll_call(const QString&);
+    void have_mgr_warning(const QString&);
     
 public slots: 
     void recv_data();
     void connect_to_server(const QString&);
     void login_to_server(const QString&);
     void send_image_to_server(const QImage&);
+
+    void response_mgr_check_in();
+    void response_mgr_roll_call();
+    void response_mgr_warning();
 };
 
 #endif

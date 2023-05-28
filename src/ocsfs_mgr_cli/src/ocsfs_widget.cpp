@@ -14,178 +14,105 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->settings = new QSettings(QCoreApplication::applicationDirPath() + 
         QString("/Config.ini"), QSettings::IniFormat );
 
-    /* open camera button */
-    this->open_camera = new QPushButton(this);
-    this->open_camera->setText(tr("打开摄像头"));
-    this->open_camera->move(300, 520);
-    this->open_camera->resize(80, 30);
+    this->parent = parent;
 
-    /* close camera button */
-    this->close_camera = new QPushButton(this);
-    this->close_camera->setText(tr("关闭摄像头"));
-    this->close_camera->move(450, 520);
-    this->close_camera->resize(80, 30);
+    /* 网格布局 */
+    this->layout = new QGridLayout(this);
 
-    /* camera list */
-    this->cameras_list = nullptr;
+    /* 学生信息区域 */
+    this->info_area = new OCSFS_Info_Dialog(this);
+    /* 滚轮 */
+    this->info_scrollarea = new QScrollArea(this);
 
-    /* 当前摄像头 */
-    this->selected_camera = new QCamera();
+    this->info_scrollarea->setWidgetResizable(true);
+    this->info_scrollarea->setAlignment(Qt::AlignRight);
+    this->info_scrollarea->setWidget(this->info_area);
 
-    /* 媒体连接器 */
-    this->capture_session = new QMediaCaptureSession();
+    this->layout->addWidget(this->info_scrollarea, 0, 1, 1, 1);
+    // this->layout->addWidget(this->info_area, 0, 1, 1, 1);
     
-    /* 图片转换器 */
-    this->image_capture = new QImageCapture();
+    /* 图像展示区域 */
+    this->picture_area = new OCSFS_Pic_Show_Dialog(this);
+    this->layout->addWidget(this->picture_area, 0, 0);
 
-    /* 摄像头画面预览窗口 */
-    this->camera_view = new QVideoWidget(this);
-    this->camera_view->move(1, 1);
-    this->camera_view->resize(500, 450);
-    this->camera_view->hide();
+    /* 互动区域 */
+    this->interactive_area = new OCSFS_Interactive_Dialog(this);
+    this->layout->addWidget(this->interactive_area, 1, 0);
 
-    /* 画面帧定制捕捉定时器 */
-    this->capture_timer = new QTimer(this);
-    this->capture_timer->setInterval(300);
-    this->capture_timer->stop();
-    
-    /* connect signal with slot */
+    this->layout->setColumnStretch(0, 2);
+    this->layout->setColumnStretch(1, 1);
+    this->layout->setRowStretch(0, 2);
+    this->layout->setRowStretch(1, 1);
 
-    QWidget::connect(this->open_camera, SIGNAL(released()), 
-        this, SLOT(slots_open_camera()), Qt::AutoConnection);
-    QWidget::connect(this->close_camera, SIGNAL(released()), 
-        this, SLOT(slots_close_camera()), Qt::AutoConnection);
-    QWidget::connect(this->image_capture, SIGNAL(imageCaptured(int, const QImage&)), 
-        this, SLOT(slots_capture_camera_frame(int, const QImage&)), Qt::AutoConnection);
-    QWidget::connect(this->capture_timer, SIGNAL(timeout()), 
-        this, SLOT(slots_timer_out()), Qt::AutoConnection);
+    this->setLayout(this->layout);
 
-    /* camera list */
-    this->camera_combobox = new QComboBox(this);
-    this->camera_combobox->move(30, 520);
-    this->camera_combobox->resize(190, 30);
-
-    /* 获取摄像头设备列表信息 */
-    this->camera_devices_refresh();
-
-    QWidget::connect(this->camera_combobox, SIGNAL(currentTextChanged(const QString&)), 
-        this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
+    this->show_student_id = new QString();
 
     return ;
 }
 
 OCSFS_Widget::~OCSFS_Widget() {
-    delete this->open_camera;
-    delete this->close_camera;
     delete this->settings;
-    delete this->capture_session;
-    delete this->image_capture;
-    delete this->camera_view;
-    delete this->capture_timer;
-    if (nullptr != this->cameras_list)
-        delete this->cameras_list;
-    delete this->camera_combobox;
-
-    return ;
-}
-
-void OCSFS_Widget::camera_devices_refresh() {
-    if (QMediaDevices::videoInputs().count() <= 0) {
-        qDebug() << "[ERROR] no video inputs devices";
-        QMessageBox::critical(this, tr("错误"), tr("找不到摄像头"));
-        return ;
-    }
-
-    const QList<QCameraDevice> cameras  = QMediaDevices::videoInputs();
-    this->cameras_list = new QList<QCameraDevice>(std::move(cameras));
-
-    this->camera_combobox->clearEditText();
-
-    bool select_flag = false;
-    for (const QCameraDevice &device : *(this->cameras_list)) {
-        this->camera_combobox->insertItem(this->camera_combobox->count(), 
-            device.description());
-
-        if (true == select_flag)
-            continue;
-
-        this->selected_camera->setCameraDevice(device);
-        select_flag = true;
-    }
-
-    if (false == select_flag) {
-        QMessageBox::critical(this, tr("错误"), tr("无摄像头"));
-        return ;
-    }
-
-    /* 使用连接器连接摄像头与预览框 */
-    this->capture_session->setCamera(this->selected_camera);
-    this->capture_session->setVideoOutput(this->camera_view);
-
-    /* 用this->image_capture 捕获帧 */
-    this->capture_session->setImageCapture(this->image_capture);
-
+    delete this->info_area;
+    delete this->info_scrollarea;
+    delete this->picture_area;
+    delete this->interactive_area;
+    delete this->layout;
+    delete this->show_student_id;
     return ;
 }
 
 /* slot function */
 
-void OCSFS_Widget::slots_open_camera() {
-    this->camera_devices_refresh();
-    if (nullptr == this->selected_camera) {
-        QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
-        return ;
-    }
-
-    /* 显示摄像头的实时图像 */
-    if (this->camera_view->isHidden())
-        this->camera_view->show();
-
-    /* 打开摄像头 */
-    if (!this->selected_camera->isActive())
-        this->selected_camera->start();
-
-    /* 开启定时器 */
-    if (!this->capture_timer->isActive())
-        this->capture_timer->start();
-
-    return ;
-}
-
-void OCSFS_Widget::slots_close_camera() {
-    /* 关闭定时器 */
-    if (this->capture_timer->isActive())
-        this->capture_timer->stop();
-
-    /* 关闭摄像头 */
-    if (this->selected_camera->isActive()) 
-        this->selected_camera->stop();
-
-    /* 隐藏预览框 */
-    if (this->camera_view->isActiveWindow())
-        this->camera_view->hide();
-
-    return ;
-}
-
-void OCSFS_Widget::slots_select_camera(const QString& selected_name) {
-    for (auto& device : *this->cameras_list) {
-        if (selected_name != device.description())
-            continue;
-        this->selected_camera->setCameraDevice(device);
-        this->capture_session->setCamera(this->selected_camera);
-        break;
-    }
+/* 有学生应答签到 */
+void OCSFS_Widget::have_user_check_in(QString &src_client_id) {
     
-    return ;
 }
 
-void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) {
-    this->send_image_to_server(frameImage);
+/* 有学生应答点名 */
+void OCSFS_Widget::have_user_roll_call(QString &src_client_id) {
+    
 }
 
-void OCSFS_Widget::slots_timer_out() {
-    this->image_capture->capture();
+/* 有学生应答警告 */
+void OCSFS_Widget::have_user_warning_res(QString &src_client_id) {
+    
 }
 
+/* 收到学生状态 */
+void OCSFS_Widget::have_user_status(int status) {
+    
+}
+
+/* 收到学生图像 */
+void OCSFS_Widget::have_user_status_image(QString &src_client_id, QImage &recv_image) {
+    if (src_client_id != *this->show_student_id)
+        return ;
+    this->picture_area->recv_show_image(recv_image);
+}
+
+/* 有学生上线 */
+void OCSFS_Widget::have_user_ready(QString &src_client_id) {
+    this->info_area->add_student_label(src_client_id);
+}
+
+
+/* 鼠标悬浮 */
+void OCSFS_Widget::slot_mouse_enter(const QString &client_id) {
+    
+}
+
+/* 鼠标离开 */
+void OCSFS_Widget::slot_mouse_leave(const QString &client_id) {
+    
+}
+
+/* 鼠标点击 */
+void OCSFS_Widget::slot_mouse_press(const QString &client_id) {
+}
+
+/* 鼠标松开 */
+void OCSFS_Widget::slot_mouse_release(const QString &client_id) {
+    *this->show_student_id = client_id;
+}
 

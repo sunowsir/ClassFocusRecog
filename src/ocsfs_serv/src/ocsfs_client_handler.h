@@ -9,8 +9,12 @@
 #ifndef _OCSFS_CLIENT_HANDLER_H
 #define _OCSFS_CLIENT_HANDLER_H
 
+#include <string>
+
 #include <QImage>
+#include <QBuffer>
 #include <QString>
+#include <QtEndian>
 #include <QTcpServer>
 #include <QTcpSocket>
 
@@ -53,19 +57,34 @@ private:
 private: 
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
-    bool step2_handler(QByteArray &recv_data);
+    bool step2_handler(const QString &src_client_id, 
+        const QString &dst_client_id, 
+        QByteArray &recv_data);
 
     bool parse_client_type_by_id();
-    bool send_data(const QString&, const QString&);
+    bool send_data(const QString&, const QString&, const QString&);
+    bool send_data_by_byte(const QString&, const QString&, const QByteArray&);
 
 public: 
     OCSFS_Client_Handler(QTcpSocket *socket);
     ~OCSFS_Client_Handler();
 
+    bool get_client_id(QString&);
+
     bool get_map_key(QString&);
 
     void send_recognize_result(const QString&/* 客户端ID（得告诉教师端，这是谁的识别结果） */, 
         const QString&/* 识别结果 */);
+    void send_image_to_mgr(const QString&, const QImage&);
+
+    void send_have_user_check_in(const QString &src_client_id);
+    void send_have_user_roll_call(const QString &src_client_id);
+    void send_have_user_warning_res(const QString &src_client_id);
+
+    void send_have_mgr_check_in(const QString &src_client_id);
+    void send_have_mgr_roll_call(const QString &src_client_id);
+    void send_have_mgr_warning(const QString &src_client_id);
+    void have_user_ready(const QString &);
 
 /* 自定义信号: 除了qt提供的各种信号，如果不满足需求，也可以自己定义信号
  * 信号不需要实现，只需要在类中声明，然后使用connect与槽函数绑定一起，
@@ -77,10 +96,20 @@ signals:
      * 调用这个信号函数，把结果丢进去 */
     void image_recognize_over(const QString&/* 客户端ID（得告诉教师端，这是谁的识别结果） */, 
         const QString&/* 识别结果 */);
+    void have_send_image_to_mgr(const QString&, const QImage&);
+
+    void have_user_check_in(const QString&);
+    void have_user_roll_call(const QString&);
+    void have_user_warning_res(const QString&);
+
+    void have_mgr_check_in(const QString&);
+    void have_mgr_roll_call(const QString&, const QString&);
+    void have_mgr_warning(const QString&, const QString&);
 
     /* 自定义一个信号函数，当确认好身份后，如果是教师端，那么调用这个信号函数
      * 将自己传递过去*/
     void mgr_client_ready(OCSFS_Client_Handler*);
+    void user_client_ready(OCSFS_Client_Handler*);
 
 /* 自定义的槽函数，关于信号函数和槽函数见如上 */
 public slots: 

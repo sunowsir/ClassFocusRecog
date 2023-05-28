@@ -8,78 +8,69 @@
 #ifndef _OCSFS_WIDGET_H
 #define _OCSFS_WIDGET_H
 
+#include <QPoint>
 #include <QTimer>
 #include <QString>
+#include <QImage>
 #include <QSettings>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QGridLayout>
 #include <QVideoWidget>
 #include <QCoreApplication>
 
+#include <QScrollArea>
+
 #include <QtMultimedia>
 #include <QMediaDevices>
+
+#include "ocsfs_info_dialog.h"
+#include "ocsfs_pic_show_dialog.h"
+#include "ocsfs_interactive_dialog.h"
 
 class OCSFS_Widget: public QWidget {
     Q_OBJECT
 private: 
 
-    QSettings       *settings;
+    QSettings                *settings;
+    QMainWindow              *parent;
 
-/* 组件 */
-    
-    /* 打开摄像头 */
-    QPushButton     *open_camera;
+    QGridLayout               *layout;
 
-    /* 关闭摄像头 */
-    QPushButton     *close_camera;
+    /* 右侧信息栏 */
+    OCSFS_Info_Dialog        *info_area;
+    QScrollArea              *info_scrollarea;
 
-    /* 列出摄像头下拉列表 */
-    QComboBox       *camera_combobox;
+    /* 左上画面区 */
+    OCSFS_Pic_Show_Dialog    *picture_area;
 
-    /* 摄像头组件 */
-    QVideoWidget    *camera_view;
+    /* 左下互动区 */
+    OCSFS_Interactive_Dialog *interactive_area;
 
-
-/* 数据 */
-
-    /* 选择的摄像头 */
-    QCamera                                 *selected_camera;
-
-    /* 摄像头列表 */
-    QList<QCameraDevice>     *cameras_list;
-
-    /* 连接器 */
-    QMediaCaptureSession                    *capture_session;
-
-    /* 媒体采集器 */
-    QImageCapture                           *image_capture;
-
-    /* 采集到的当前一帧画面, 该属性随刷新率变化而不断变化 */
-    QImage                                  *camera_frame;
-
-    /* 定时器，用于定时采集摄像头图像 */
-    QTimer                                  *capture_timer;
-
-private: 
-    
-    void camera_devices_refresh();
+    /* 鼠标点了哪个学生 */
+    QString                  *show_student_id;
 
 public: 
     OCSFS_Widget(QMainWindow *parent = nullptr);
     ~OCSFS_Widget();
 
 signals: 
-    void send_image_to_server(const QImage&);
 
 public slots:
-    void slots_open_camera();
-    void slots_close_camera();
-    void slots_select_camera(const QString&);
-    void slots_capture_camera_frame(int, const QImage&);
-    void slots_timer_out();
+    void have_user_check_in(QString &);
+    void have_user_roll_call(QString &);
+    void have_user_warning_res(QString &);
+    void have_user_status(int);
+    void have_user_status_image(QString&, QImage&);
+    void have_user_ready(QString&);
+
+    void slot_mouse_enter(const QString&);
+    void slot_mouse_leave(const QString&);
+    void slot_mouse_press(const QString&);
+    void slot_mouse_release(const QString&);
 };
 
 #endif

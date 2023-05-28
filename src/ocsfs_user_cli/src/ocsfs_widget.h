@@ -42,6 +42,12 @@ private:
     /* 摄像头组件 */
     QVideoWidget    *camera_view;
 
+    /* 学生签到按钮 */
+    QPushButton     *checkin_button;
+
+    /* 学生确认点名按钮 */
+    QPushButton     *rollcall_button;
+
 
 /* 数据 */
 
@@ -74,12 +80,22 @@ public:
 signals: 
     void send_image_to_server(const QImage&);
 
+    void response_mgr_check_in();
+    void response_mgr_roll_call();
+    void response_mgr_warning();
+
 public slots:
     void slots_open_camera();
     void slots_close_camera();
     void slots_select_camera(const QString&);
     void slots_capture_camera_frame(int, const QImage&);
     void slots_timer_out();
+    void slots_checkin_click();
+    void slots_rollcall_click();
+
+    void have_mgr_check_in(const QString &);
+    void have_mgr_roll_call(const QString &);
+    void have_mgr_warning(const QString &);
 };
 
 #endif

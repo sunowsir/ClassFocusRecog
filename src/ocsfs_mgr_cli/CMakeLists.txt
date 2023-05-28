@@ -27,6 +27,11 @@ add_executable(ocsfs_mgr_cli
     src/ocsfs_login_widget.cpp
     src/ocsfs_widget.cpp
     src/ocsfs_client.cpp
+    src/ocsfs_info_dialog.cpp
+    src/ocsfs_pic_show_dialog.cpp
+    src/ocsfs_interactive_dialog.cpp
+    src/ocsfs_student_info_dialog.cpp
+    src/ocsfs_barchar_label.cpp
     ${TS_FILES}
 )
 

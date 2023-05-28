@@ -71,6 +71,30 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     QWidget::connect(this->camera_combobox, SIGNAL(currentTextChanged(const QString&)), 
         this, SLOT(slots_select_camera(const QString&)), Qt::AutoConnection);
 
+    /* 学生签到按钮 */
+    this->checkin_button = new QPushButton(this);
+    this->checkin_button->setText(tr("签到"));
+    this->checkin_button->move(320, 520);
+    this->checkin_button->resize(80, 30);
+    /* 初始设置默认不可点击，只有教师发起签到才能点击 */
+    this->checkin_button->setEnabled(false);
+
+    /* 绑定按钮点击信号 */
+    QWidget::connect(this->checkin_button, SIGNAL(released()), 
+        this, SLOT(slots_checkin_click()), Qt::AutoConnection);
+
+    /* 学生确认点名按钮 */
+    this->rollcall_button = new QPushButton(this);
+    this->rollcall_button->setText(tr("应答点名"));
+    this->rollcall_button->move(340, 520);
+    this->rollcall_button->resize(80, 30);
+    /* 初始设置默认不可点击，只有教师发起点名才能点击 */
+    this->rollcall_button->setEnabled(false);
+
+    /* 绑定按钮点击信号 */
+    QWidget::connect(this->rollcall_button, SIGNAL(released()), 
+        this, SLOT(slots_rollcall_click()), Qt::AutoConnection);
+
     return ;
 }
 
@@ -85,6 +109,8 @@ OCSFS_Widget::~OCSFS_Widget() {
     if (nullptr != this->cameras_list)
         delete this->cameras_list;
     delete this->camera_combobox;
+    delete this->checkin_button;
+    delete this->rollcall_button;
 
     return ;
 }
@@ -188,4 +214,34 @@ void OCSFS_Widget::slots_timer_out() {
     this->image_capture->capture();
 }
 
+/* 学生点击了签到按钮后该做什么事 */
+void OCSFS_Widget::slots_checkin_click() {
+    this->checkin_button->setEnabled(false);
+}
+
+/* 学生点击了提问按钮后应该做什么事 */
+void OCSFS_Widget::slots_rollcall_click() {
+    this->rollcall_button->setEnabled(false);
+}
+
+/* 教师端发来签到请求 */
+void OCSFS_Widget::have_mgr_check_in(const QString &src_client_id) {
+    /* 设置按钮为可点击状态 */
+    this->checkin_button->setEnabled(true);
+    this->response_mgr_check_in();
+}
+
+/* 教师端发来点名请求 */
+void OCSFS_Widget::have_mgr_roll_call(const QString &src_client_id) {
+    /* 设置按钮为可点击状态 */
+    this->rollcall_button->setEnabled(true);
+    this->response_mgr_roll_call();
+}
+
+/* 教师端发来的警告 */
+void OCSFS_Widget::have_mgr_warning(const QString &src_client_id) {
+    QMessageBox::critical(this, tr("警告"), 
+        tr("编号") + src_client_id + tr("教师发来警告，请您注意状态!"));
+    this->response_mgr_warning();
+}
 
