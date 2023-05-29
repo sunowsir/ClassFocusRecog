@@ -29,10 +29,14 @@ private:
     QMap<QString, OCSFS_BarChartLabel*>   *stu_dialog_list;
 
     QVBoxLayout *layout;
+private: 
+    bool student_status_get(int&, QString&);
 
 public: 
     OCSFS_Info_Dialog(QWidget *parent = nullptr);
     ~OCSFS_Info_Dialog();
+
+    void have_user_status(QString&, int&);
 
 signals:
     void signal_have_user_status_image(QString&, QImage&);

@@ -96,20 +96,17 @@ void OCSFS_Client::recv_data() {
         return ;
     }
 
-    qDebug() << "recv_data: " << recv_data;
-
     int recv_data_idx = 0;
-    while (recv_data.size() >= (long long int)OCSFS_PROTO_HEAD_LEN) {
+    while ((recv_data_idx <= recv_data.size()) && 
+        (recv_data.size() - recv_data_idx + 1) >= (long long int)OCSFS_PROTO_HEAD_LEN) {
         QString src_client_id;
         QString dst_client_id;
         int data_len = 0;
         QByteArray data = "";
-        this->parse_data(src_client_id, dst_client_id, recv_data, data, data_len);
+        this->parse_data(src_client_id, dst_client_id, 
+            recv_data + recv_data_idx, 
+            data, data_len);
 
-        qDebug() << "src: " << src_client_id << ", dst: " <<dst_client_id << ", data" 
-            << data << "data_len: " << data_len;
-
-        recv_data.remove(recv_data_idx, OCSFS_PROTO_HEAD_LEN + data_len);
         recv_data_idx += OCSFS_PROTO_HEAD_LEN + data_len;
 
         /* 处理服务器发来的消息 */
@@ -168,6 +165,8 @@ bool OCSFS_Client::step1_handler(QByteArray &recv_data) {
 
 /* 正式开始工作，开始接收服务器消息 */
 bool OCSFS_Client::step2_handler(QString src_client_id, QByteArray &recv_data) {
+    auto stu_status = recv_data.toInt(nullptr, 10);
+
     /* 有学生响应签到 */
     if (QString(recv_data) == QString(OCSFS_CheckIn_ACK)) {
         this->have_user_check_in(src_client_id);
@@ -178,11 +177,10 @@ bool OCSFS_Client::step2_handler(QString src_client_id, QByteArray &recv_data) {
     } else if (QString(recv_data) == QString(OCSFS_To_User_Warning_ACK)) {
         this->have_user_warning_res(src_client_id);
     /* 学生状态 */
-    } else if (((recv_data.toHex().toInt(nullptr, 10) >= OCSFS_FACE_BASE) && 
-        (recv_data.toHex().toInt(nullptr, 10) <= OCSFS_FACE_MAX)) || 
-        (recv_data.toHex().toInt(nullptr, 10) == OCSFS_head_PROFILE)) {
-        qDebug() << "student: " << src_client_id << ", status: " << recv_data.toHex().toInt(nullptr, 10);
-        this->have_user_status(recv_data.toHex().toInt(nullptr, 10));
+    } else if (((stu_status >= OCSFS_FACE_BASE) && 
+        (stu_status <= OCSFS_FACE_MAX)) || 
+        (stu_status == OCSFS_head_PROFILE)) {
+        this->have_user_status(src_client_id, stu_status);
     /* 有学生上线 */
     } else if (QString(recv_data) == QString(OCSFS_User_Ready_SYN)) {
         this->have_user_ready(src_client_id);

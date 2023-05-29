@@ -68,6 +68,19 @@
 /* 有多少中表情 */
 #define OCSFS_FACE_TYPE_NUM    ((OCSFS_FACE_MAX - OCSFS_FACE_BASE) / OCSFS_FACE_STEP)
 
+/* 积极状态 */
+#define OCSFS_STATUS_TYPE_active   (10)
+/* 中性状态 */
+#define OCSFS_STATUS_TYPE_neutral  (11)
+/* 消极状态 */
+#define OCSFS_STATUS_TYPE_negative (12)
+
+/* 持续接收到20个闭眼状态，认定为消极 */
+#define OCSFS_CLOSEEYES_keep_count (20)
+/* 持续接收到10个哈欠状态，认定为消极 */
+#define OCSFS_YAWN_keep_count      (10)
+
+
 /* 用来训练的各类表情图片各有多少，
  * 注意：要保证每种表情的图片都有如下数量
  * */

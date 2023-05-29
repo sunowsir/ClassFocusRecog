@@ -8,10 +8,11 @@
 #ifndef _OCSFS_WIDGET_H
 #define _OCSFS_WIDGET_H
 
+#include <QMap>
 #include <QPoint>
 #include <QTimer>
-#include <QString>
 #include <QImage>
+#include <QString>
 #include <QSettings>
 #include <QCheckBox>
 #include <QComboBox>
@@ -28,6 +29,7 @@
 #include <QMediaDevices>
 
 #include "ocsfs_info_dialog.h"
+#include "ocsfs_float_widget.h"
 #include "ocsfs_pic_show_dialog.h"
 #include "ocsfs_interactive_dialog.h"
 
@@ -38,7 +40,9 @@ private:
     QSettings                *settings;
     QMainWindow              *parent;
 
-    QGridLayout               *layout;
+    OCSFS_Float_Widget       *float_pie;
+
+    QGridLayout              *layout;
 
     /* 右侧信息栏 */
     OCSFS_Info_Dialog        *info_area;
@@ -53,6 +57,15 @@ private:
     /* 鼠标点了哪个学生 */
     QString                  *show_student_id;
 
+    /* 存储每个学生的三种状态的总数，以此计算百分比 */
+    QMap<QString, std::tuple<uint64_t, uint64_t, uint64_t>> *status_map;
+
+    /* 存储每个学生的闭眼和哈欠的总数，以此来判定是否是消极状态 */
+    QMap<QString, std::tuple<uint64_t, uint64_t>> *sleep_status_map;
+    
+private:
+    bool student_status_type_get(int&, int&);
+
 public: 
     OCSFS_Widget(QMainWindow *parent = nullptr);
     ~OCSFS_Widget();
@@ -63,7 +76,7 @@ public slots:
     void have_user_check_in(QString &);
     void have_user_roll_call(QString &);
     void have_user_warning_res(QString &);
-    void have_user_status(int);
+    void have_user_status(QString&, int&);
     void have_user_status_image(QString&, QImage&);
     void have_user_ready(QString&);
 

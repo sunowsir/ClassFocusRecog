@@ -124,8 +124,8 @@ void OCSFS_Window::login_to_server_success() {
         this->ssi_widget, SLOT(have_user_roll_call(QString&)), Qt::AutoConnection);
 
     /* 有学生发来状态 */
-    QObject::connect(this->client_socket, SIGNAL(have_user_status(int)), 
-        this->ssi_widget, SLOT(have_user_status(int)), Qt::AutoConnection);
+    QObject::connect(this->client_socket, SIGNAL(have_user_status(QString&, int&)), 
+        this->ssi_widget, SLOT(have_user_status(QString&, int&)), Qt::AutoConnection);
 
     /* 有学生发来实时图像 */
     QObject::connect(this->client_socket, SIGNAL(have_user_status_image(QString&, QImage&)), 

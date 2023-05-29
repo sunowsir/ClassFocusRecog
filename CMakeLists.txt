@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
 
 find_package(Qt6 COMPONENTS Widgets LinguistTools REQUIRED)
-find_package(Qt6 COMPONENTS Multimedia MultimediaWidgets REQUIRED)
+find_package(Qt6 COMPONENTS Multimedia MultimediaWidgets Charts REQUIRED)
 
 # OpenCV
 set(OpenCV_DIR /usr/local/lib)

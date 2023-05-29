@@ -61,7 +61,7 @@ signals:
     void have_user_check_in(QString &);
     void have_user_roll_call(QString &);
     void have_user_warning_res(QString &);
-    void have_user_status(int);
+    void have_user_status(QString&, int&);
     void have_user_status_image(QString&, QImage&);
     void have_user_ready(QString&);
     
