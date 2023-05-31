@@ -169,14 +169,17 @@ void OCSFS_Client::send_image_to_server(const QImage &image) {
     this->send_data_by_byte(this->client_id, OCSFS_SERVER_ID, byteArray);
 }
 
+/* 回应签到 */
 void OCSFS_Client::response_mgr_check_in() {
-    
+    this->send_data(this->client_id, OCSFS_SERVER_ID, QString(OCSFS_CheckIn_ACK));
 }
 
+/* 回应点名 */
 void OCSFS_Client::response_mgr_roll_call() {
-    
+    this->send_data(this->client_id, OCSFS_SERVER_ID, QString(OCSFS_RollCall_ACK));
 }
 
+/* 回应警告 */
 void OCSFS_Client::response_mgr_warning() {
-    
+    this->send_data(this->client_id, OCSFS_SERVER_ID, QString(OCSFS_To_User_Warning_ACK));
 }

@@ -134,6 +134,15 @@ void OCSFS_Window::login_to_server_success() {
     /* 有学生上线 */
     QObject::connect(this->client_socket, SIGNAL(have_user_ready(QString&)), 
         this->ssi_widget, SLOT(have_user_ready(QString&)), Qt::AutoConnection);
+
+    /* 点击界面签到按钮 */
+    QWidget::connect(this->ssi_widget, SIGNAL(checkin_click()), 
+        this->client_socket, SLOT(slot_checkin_click()), Qt::AutoConnection);
+
+    /* 点击界面点名按钮 */
+    QWidget::connect(this->ssi_widget, SIGNAL(rollcall_click(const QString&)), 
+        this->client_socket, SLOT(slot_rollcall_click(const QString&)), Qt::AutoConnection);
+
 }
 
 /* 握手失败 */
@@ -148,3 +157,4 @@ void OCSFS_Window::handshake_failed() {
     QObject::connect(this->login_widget, SIGNAL(login_to_server(const QString&)), 
         this->client_socket, SLOT(login_to_server(const QString&)), Qt::AutoConnection);
 }
+

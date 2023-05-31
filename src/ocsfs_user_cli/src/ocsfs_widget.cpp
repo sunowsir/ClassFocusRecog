@@ -23,7 +23,7 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     /* close camera button */
     this->close_camera = new QPushButton(this);
     this->close_camera->setText(tr("关闭摄像头"));
-    this->close_camera->move(450, 520);
+    this->close_camera->move(400, 520);
     this->close_camera->resize(80, 30);
 
     /* camera list */
@@ -74,7 +74,7 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     /* 学生签到按钮 */
     this->checkin_button = new QPushButton(this);
     this->checkin_button->setText(tr("签到"));
-    this->checkin_button->move(320, 520);
+    this->checkin_button->move(500, 520);
     this->checkin_button->resize(80, 30);
     /* 初始设置默认不可点击，只有教师发起签到才能点击 */
     this->checkin_button->setEnabled(false);
@@ -86,7 +86,7 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     /* 学生确认点名按钮 */
     this->rollcall_button = new QPushButton(this);
     this->rollcall_button->setText(tr("应答点名"));
-    this->rollcall_button->move(340, 520);
+    this->rollcall_button->move(600, 520);
     this->rollcall_button->resize(80, 30);
     /* 初始设置默认不可点击，只有教师发起点名才能点击 */
     this->rollcall_button->setEnabled(false);
@@ -217,25 +217,25 @@ void OCSFS_Widget::slots_timer_out() {
 /* 学生点击了签到按钮后该做什么事 */
 void OCSFS_Widget::slots_checkin_click() {
     this->checkin_button->setEnabled(false);
+    this->response_mgr_check_in();
 }
 
-/* 学生点击了提问按钮后应该做什么事 */
+/* 学生点击了点名按钮后应该做什么事 */
 void OCSFS_Widget::slots_rollcall_click() {
     this->rollcall_button->setEnabled(false);
+    this->response_mgr_roll_call();
 }
 
 /* 教师端发来签到请求 */
 void OCSFS_Widget::have_mgr_check_in(const QString &src_client_id) {
     /* 设置按钮为可点击状态 */
     this->checkin_button->setEnabled(true);
-    this->response_mgr_check_in();
 }
 
 /* 教师端发来点名请求 */
 void OCSFS_Widget::have_mgr_roll_call(const QString &src_client_id) {
     /* 设置按钮为可点击状态 */
     this->rollcall_button->setEnabled(true);
-    this->response_mgr_roll_call();
 }
 
 /* 教师端发来的警告 */

@@ -95,17 +95,25 @@ OCSFS_Widget::~OCSFS_Widget() {
 
 /* 有学生应答签到 */
 void OCSFS_Widget::have_user_check_in(QString &src_client_id) {
-    
+    // 调用notify-send命令发送系统通知
+    QProcess::execute("notify-send", 
+        QStringList() << "通知" << QString("学生:" + src_client_id + "已签到"));
+    this->interactive_area->have_user_check_in(src_client_id);
 }
 
 /* 有学生应答点名 */
 void OCSFS_Widget::have_user_roll_call(QString &src_client_id) {
-    
+    // 调用notify-send命令发送系统通知
+    QProcess::execute("notify-send", 
+        QStringList() << "通知" << QString("学生:" + src_client_id + "已收到点名"));
+    this->interactive_area->have_user_roll_call(src_client_id);
 }
 
 /* 有学生应答警告 */
 void OCSFS_Widget::have_user_warning_res(QString &src_client_id) {
-    
+    // 调用notify-send命令发送系统通知
+    QProcess::execute("notify-send", 
+        QStringList() << "通知" << QString("学生:" + src_client_id + "已收到警告"));
 }
 
 /* 收到学生状态 */
@@ -193,6 +201,7 @@ void OCSFS_Widget::have_user_ready(QString &src_client_id) {
     std::get<1>(status) = 0;
     std::get<2>(status) = 0;
     this->status_map->insert(src_client_id, status);
+    this->interactive_area->have_user_ready(src_client_id);
 }
 
 
@@ -215,3 +224,19 @@ void OCSFS_Widget::slot_mouse_release(const QString &client_id) {
     *this->show_student_id = client_id;
 }
 
+void OCSFS_Widget::slot_checkin_click() {
+    this->checkin_click();
+}
+
+void OCSFS_Widget::slot_rollcall_click() {
+    // 生成一个随机数，范围为0到this->status_map的大小减1
+    int randomIndex = std::rand() % this->status_map->size();
+
+    // 获取对应的key
+    auto it = this->status_map->begin();
+    std::advance(it, randomIndex);
+    QString randomKey = it.key();
+    qDebug() << "抽取到学生: " << randomKey;
+
+    this->rollcall_click(randomKey);
+}

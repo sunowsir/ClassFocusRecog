@@ -60,30 +60,37 @@ void OCSFS_Client_Handler::send_image_to_mgr(const QString &src_client_id, const
     // this->send_data_by_byte(src_client_id, this->client_id, byteArray);
 }
 
+/* 转发学生签到响应 */
 void OCSFS_Client_Handler::send_have_user_check_in(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_CheckIn_ACK));
 }
 
+/* 转发学生点名响应 */
 void OCSFS_Client_Handler::send_have_user_roll_call(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_RollCall_ACK));
 }
 
+/* 转发学生警告响应 */
 void OCSFS_Client_Handler::send_have_user_warning_res(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_To_User_Warning_ACK));
 }
 
+/* 转发教师发起签到 */
 void OCSFS_Client_Handler::send_have_mgr_check_in(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_CheckIn_SYN));
 }
 
+/* 转发教师发起点名 */
 void OCSFS_Client_Handler::send_have_mgr_roll_call(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_RollCall_SYN));
 }
 
+/* 转发教师发起警告 */
 void OCSFS_Client_Handler::send_have_mgr_warning(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_To_User_Warning_SYN));
 }
 
+/* 向教师端发送有学生上线消息 */
 void OCSFS_Client_Handler::have_user_ready(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_User_Ready_SYN));
 }
@@ -123,14 +130,17 @@ bool OCSFS_Client_Handler::step2_handler(const QString &src_client_id,
 
     /* 有学生响应签到 */
     if (QString(recv_data) == QString(OCSFS_CheckIn_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 签到响应";
         this->have_user_check_in(src_client_id);
         return true;
     /* 有学生响应点名 */
     } else if (QString(recv_data) == QString(OCSFS_RollCall_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 点名响应";
         this->have_user_roll_call(src_client_id);
         return true;
     /* 有学生响应警告 */
     } else if (QString(recv_data) == QString(OCSFS_To_User_Warning_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 警告响应";
         this->have_user_warning_res(src_client_id);
         return true;
     /* 有教师发起签到 */

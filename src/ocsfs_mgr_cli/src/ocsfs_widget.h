@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QImage>
 #include <QString>
+#include <QProcess>
 #include <QSettings>
 #include <QCheckBox>
 #include <QComboBox>
@@ -71,11 +72,13 @@ public:
     ~OCSFS_Widget();
 
 signals: 
+    void checkin_click();
+    void rollcall_click(const QString &);
 
 public slots:
-    void have_user_check_in(QString &);
-    void have_user_roll_call(QString &);
-    void have_user_warning_res(QString &);
+    void have_user_check_in(QString&);
+    void have_user_roll_call(QString&);
+    void have_user_warning_res(QString&);
     void have_user_status(QString&, int&);
     void have_user_status_image(QString&, QImage&);
     void have_user_ready(QString&);
@@ -84,6 +87,9 @@ public slots:
     void slot_mouse_leave(const QString&);
     void slot_mouse_press(const QString&);
     void slot_mouse_release(const QString&);
+
+    void slot_checkin_click();
+    void slot_rollcall_click();
 };
 
 #endif

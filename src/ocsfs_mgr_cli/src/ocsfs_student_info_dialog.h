@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QDialog>
 #include <QWidget>
+#include <QString>
 
 class OCSFS_Student_Info_Dialog : public QDialog {
     Q_OBJECT
@@ -21,10 +22,13 @@ private:
 
     QLabel      *info_label;
 
+    QString     *client_id;
+
 public: 
     OCSFS_Student_Info_Dialog(QDialog *parent = nullptr);
     ~OCSFS_Student_Info_Dialog();
-    bool add_widget_over();
+
+    bool set_status(const QString&);
     
 };
 

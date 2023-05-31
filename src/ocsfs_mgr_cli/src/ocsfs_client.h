@@ -64,11 +64,15 @@ signals:
     void have_user_status(QString&, int&);
     void have_user_status_image(QString&, QImage&);
     void have_user_ready(QString&);
+
     
 public slots: 
     void recv_data();
     void connect_to_server(const QString&);
     void login_to_server(const QString&);
+
+    void slot_checkin_click();
+    void slot_rollcall_click(const QString&);
 };
 
 #endif

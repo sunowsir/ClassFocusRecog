@@ -10,14 +10,14 @@
 
 OCSFS_Student_Info_Dialog::OCSFS_Student_Info_Dialog(QDialog *parent) {
     this->parent = parent;
+    this->info_label = new QLabel(this);
+    this->info_label->setText(QString("学生：0123456789"));
 }
 
 OCSFS_Student_Info_Dialog::~OCSFS_Student_Info_Dialog() {
     delete this->info_label;
 }
 
-bool OCSFS_Student_Info_Dialog::add_widget_over() {
-    this->info_label = new QLabel(this);
-    this->info_label->setText(QString("学生：0123456789"));
+bool OCSFS_Student_Info_Dialog::set_status(const QString &status) {
     return true;
 }

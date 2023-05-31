@@ -169,12 +169,15 @@ bool OCSFS_Client::step2_handler(QString src_client_id, QByteArray &recv_data) {
 
     /* 有学生响应签到 */
     if (QString(recv_data) == QString(OCSFS_CheckIn_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 签到响应";
         this->have_user_check_in(src_client_id);
     /* 有学生响应点名 */
     } else if (QString(recv_data) == QString(OCSFS_RollCall_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 点名响应";
         this->have_user_roll_call(src_client_id);
     /* 有学生响应警告 */
     } else if (QString(recv_data) == QString(OCSFS_To_User_Warning_ACK)) {
+        qDebug() << "收到学生:" << src_client_id << " 警告响应";
         this->have_user_warning_res(src_client_id);
     /* 学生状态 */
     } else if (((stu_status >= OCSFS_FACE_BASE) && 
@@ -203,5 +206,17 @@ void OCSFS_Client::login_to_server(const QString &client_id) {
     qDebug() << "准备登陆, 用户ID: " << client_id;
     this->client_id = client_id;
     this->send_data(this->client_id, OCSFS_SERVER_ID, this->client_id);
+}
+
+/* 请求签到 */
+void OCSFS_Client::slot_checkin_click() {
+    qDebug() << "请求签到";
+    this->send_data(this->client_id, OCSFS_SERVER_ID, QString(OCSFS_CheckIn_SYN));
+}
+
+/* 随即抽取学生发起点名 */
+void OCSFS_Client::slot_rollcall_click(const QString &dst_client_id) {
+    qDebug() << "向学生: " << dst_client_id << "发起点名";
+    this->send_data(this->client_id, dst_client_id, QString(OCSFS_RollCall_SYN));
 }
 

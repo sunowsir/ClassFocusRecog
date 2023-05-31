@@ -11,9 +11,6 @@
 OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) : 
     parent(parent) {
 
-    // this->layout = new QVBoxLayout(this);
-    // this->setLayout(this->layout);
-
     this->active = new QPieSlice(this);
     this->active->setLabel(QString("积极"));
     this->active->setValue(40);
@@ -52,8 +49,6 @@ OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) :
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
 
     this->hide();
-
-    // this->layout->addWidget(this->chartview);
 }
 
 OCSFS_Float_Widget::~OCSFS_Float_Widget() {
@@ -92,9 +87,9 @@ bool OCSFS_Float_Widget::set_percent(const int &active_percent,
 
 void OCSFS_Float_Widget::slot_show_widget() {
     /* 先删掉series */
-    this->chartview->chart()->removeAllSeries();
+    // this->chartview->chart()->removeAllSeries();
     /* 再重新添加 */
-    this->chartview->chart()->addSeries(this->series);
+    // this->chartview->chart()->addSeries(this->series);
 
     this->chartview->show();
     this->show();
@@ -102,9 +97,9 @@ void OCSFS_Float_Widget::slot_show_widget() {
 
 void OCSFS_Float_Widget::slot_hide_widget() {
     /* 先删掉series */
-    this->chartview->chart()->removeAllSeries();
+    // this->chartview->chart()->removeAllSeries();
     /* 再重新添加 */
-    this->chartview->chart()->addSeries(this->series);
+    // this->chartview->chart()->addSeries(this->series);
 
     this->chartview->hide();
     this->hide();

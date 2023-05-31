@@ -22,8 +22,6 @@ class OCSFS_Float_Widget : public QDialog {
 private: 
     QWidget     *parent;
 
-    QVBoxLayout *layout;
-
     /* 用来表示学生的积极状态百分比 */
     QPieSlice   *active;
     /* 用来表示学生的中性状态百分比 */
