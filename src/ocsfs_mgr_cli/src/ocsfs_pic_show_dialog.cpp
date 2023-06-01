@@ -10,7 +10,12 @@
 
 OCSFS_Pic_Show_Dialog::OCSFS_Pic_Show_Dialog(QWidget *parent) {
     this->parent = parent;
+
+    this->layout = new QVBoxLayout(this);
+    this->setLayout(this->layout);
+
     this->show_label = new QLabel(this);
+    this->layout->addWidget(this->show_label);
 }
 
 OCSFS_Pic_Show_Dialog::~OCSFS_Pic_Show_Dialog() {

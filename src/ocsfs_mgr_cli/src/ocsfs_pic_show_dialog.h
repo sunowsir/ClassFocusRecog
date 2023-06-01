@@ -13,13 +13,14 @@
 #include <QWidget>
 #include <QImage>
 #include <QLabel>
+#include <QVBoxLayout>
 
 class OCSFS_Pic_Show_Dialog : public QDialog {
     Q_OBJECT
 
 private: 
     QWidget     *parent;
-
+    QVBoxLayout *layout;
     QLabel      *show_label;
 
 public: 

@@ -57,7 +57,7 @@ void OCSFS_Client_Handler::send_image_to_mgr(const QString &src_client_id, const
     image.save(&buffer, "JPG"); 
     buffer.close();
 
-    // this->send_data_by_byte(src_client_id, this->client_id, byteArray);
+    this->send_data_by_byte(src_client_id, this->client_id, byteArray);
 }
 
 /* 转发学生签到响应 */

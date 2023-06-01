@@ -77,30 +77,15 @@ bool OCSFS_Float_Widget::set_percent(const int &active_percent,
     this->series->slices().at(1)->setValue(neutral_percent);
     this->series->slices().at(2)->setValue(negative_percent);
 
-    /* 先删掉series */
-    this->chartview->chart()->removeAllSeries();
-    /* 再重新添加 */
-    this->chartview->chart()->addSeries(this->series);
-
     return true;
 }
 
 void OCSFS_Float_Widget::slot_show_widget() {
-    /* 先删掉series */
-    // this->chartview->chart()->removeAllSeries();
-    /* 再重新添加 */
-    // this->chartview->chart()->addSeries(this->series);
-
     this->chartview->show();
     this->show();
 }
 
 void OCSFS_Float_Widget::slot_hide_widget() {
-    /* 先删掉series */
-    // this->chartview->chart()->removeAllSeries();
-    /* 再重新添加 */
-    // this->chartview->chart()->addSeries(this->series);
-
     this->chartview->hide();
     this->hide();
 }

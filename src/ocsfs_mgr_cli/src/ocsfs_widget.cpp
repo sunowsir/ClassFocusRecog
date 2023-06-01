@@ -119,16 +119,19 @@ void OCSFS_Widget::have_user_warning_res(QString &src_client_id) {
 /* 收到学生状态 */
 void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     int status_type;
+    /* 将面部状态对应成听课状态 */
     this->student_status_type_get(status_num, status_type);
 
+    /* 将状态传递给学生信息面板来显示面部状态 */
     this->info_area->have_user_status(src_client_id, status_num);
 
+    /* 获取这个学生闭眼和打哈欠持续的次数 */
     std::tuple<uint64_t, uint64_t> sleep_status;
-
     if (this->sleep_status_map->contains(src_client_id)) {
         sleep_status = this->sleep_status_map->find(src_client_id).value();
     } 
 
+    /* 判断面部状体是否是闭眼或打哈欠，若是则对应数量加1 */
     switch(status_num) {
         case OCSFS_face_CLOSEEYES : {
             if (std::get<0>(sleep_status) >= OCSFS_CLOSEEYES_keep_count) {
@@ -139,21 +142,27 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
             }
         } break;
         case OCSFS_face_YAWN : {
-            if (std::get<0>(sleep_status) >= OCSFS_YAWN_keep_count) {
-                std::get<0>(sleep_status) = 0;
+            if (std::get<1>(sleep_status) >= OCSFS_YAWN_keep_count) {
+                std::get<1>(sleep_status) = 0;
                 status_type = OCSFS_STATUS_TYPE_negative;
             } else {
-                std::get<0>(sleep_status)++;
+                std::get<1>(sleep_status)++;
             }
         } break;
+        /* 若都不是则清零 */
+        default: {
+            std::get<0>(sleep_status) = 0;
+            std::get<1>(sleep_status) = 0;
+        }
     }
 
+    /* 保存学生打哈欠或闭眼次数 */
     this->sleep_status_map->insert(src_client_id, sleep_status);
     if (-1 == status_type) 
         return ;
 
+    /* 获取学生三种听课状态的持续次数 */
     std::tuple<uint64_t, uint64_t, uint64_t> status;
-
     if (this->status_map->contains(src_client_id)) {
         status = this->status_map->find(src_client_id).value();
     } 
@@ -161,8 +170,8 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     uint64_t &active_num = std::get<0>(status);
     uint64_t &neutral_num = std::get<1>(status);
     uint64_t &negative_num = std::get<2>(status);
-    uint64_t total_num = active_num + neutral_num + negative_num;
 
+    /* 给对应听课状态计数器加1 */
     switch(status_type) {
         case OCSFS_STATUS_TYPE_active : {
             active_num++;
@@ -178,10 +187,27 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
             return ;
         }
     }
+
+    uint64_t total_num = active_num + neutral_num + negative_num;
+
+    /* 保存 */
     this->status_map->insert(src_client_id, status);
-    this->float_pie->set_percent((active_num / total_num) * 100, 
-        (neutral_num / total_num) * 100, 
-        (negative_num / total_num) * 100);
+
+    /* 计算百分比并丢给界面去显示 */
+    int active_percent = 0; 
+    if (total_num != 0)
+        active_percent = (active_num / total_num) * 100;
+
+    int neutral_percent = 0; 
+    if (total_num != 0)
+        neutral_percent = (neutral_num / total_num) * 100;
+
+    int negative_percent = 0; 
+    if (total_num != 0)
+        negative_percent = (negative_num / total_num) * 100;
+
+    this->float_pie->set_percent(active_percent, 
+        neutral_percent, negative_percent);
 
     return ;
 }
