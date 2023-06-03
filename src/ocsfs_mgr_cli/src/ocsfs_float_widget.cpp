@@ -12,12 +12,12 @@ OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) :
     parent(parent) {
     this->resize(OCSFS_PROGRESS_Width, OCSFS_PROGRESS_Height);
 
-    // 设置窗口大小策略为可变大小
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // // 设置窗口大小策略为可变大小
+    // this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    /* 无边框 */
-    this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
-    this->setAttribute(Qt::WA_TranslucentBackground, true);
+    // /* 无边框 */
+    // this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
+    // this->setAttribute(Qt::WA_TranslucentBackground, true);
 
     this->active_percent = 0.3;
     this->neutral_percent = 0.3;
@@ -34,8 +34,6 @@ OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) :
     this->active_text_color = Qt::white;
     this->neutral_text_color = Qt::black;
     this->negative_text_color = Qt::black;
-
-    this->hide();
 }
 
 OCSFS_Float_Widget::~OCSFS_Float_Widget() {
@@ -112,6 +110,14 @@ void OCSFS_Float_Widget::paintEvent(QPaintEvent *event) {
     painter.setPen(this->negative_text_color);
     painter.drawText(QRectF(active_width + neutral_width, 
         0, negative_width, this->height()), Qt::AlignCenter, this->negative_text);
+
+    // 设置QLabel的样式
+    QString style = "QLabel {"
+                "border: 1px solid gray;"
+                "border-radius: 5px;"
+                "}";
+    this->setStyleSheet(style);
+
 }
 
 void OCSFS_Float_Widget::slot_show_widget() {

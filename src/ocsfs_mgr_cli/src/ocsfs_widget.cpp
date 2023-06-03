@@ -75,7 +75,7 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
 
     this->show_student_id = new QString();
 
-    this->float_pie = new OCSFS_Float_Widget();
+    // this->float_pie = new OCSFS_Float_Widget();
 
     this->status_map = new QMap<QString, std::tuple<uint64_t, uint64_t, uint64_t>>();
     this->sleep_status_map = new QMap<QString, std::tuple<uint64_t, uint64_t>>();
@@ -209,8 +209,8 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     if (total_num != 0)
         negative_percent = (double)negative_num / total_num;
 
-    this->float_pie->set_percent(active_percent, 
-        neutral_percent, negative_percent);
+    // this->float_pie->set_percent(active_percent, 
+    //     neutral_percent, negative_percent);
 
     return ;
 }
@@ -236,13 +236,13 @@ void OCSFS_Widget::have_user_ready(QString &src_client_id) {
 
 /* 鼠标悬浮 */
 void OCSFS_Widget::slot_mouse_enter(const QString &client_id) {
-    this->float_pie->slot_show_widget();
+    // this->float_pie->slot_show_widget();
 
 }
 
 /* 鼠标离开 */
 void OCSFS_Widget::slot_mouse_leave(const QString &client_id) {
-    this->float_pie->slot_hide_widget();
+    // this->float_pie->slot_hide_widget();
 }
 
 /* 鼠标点击 */

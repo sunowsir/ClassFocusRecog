@@ -13,23 +13,32 @@
 #include <QDialog>
 #include <QWidget>
 #include <QString>
+#include <QVBoxLayout>
 
-class OCSFS_Student_Info_Dialog : public QDialog {
+#include "ocsfs_float_widget.h"
+
+class OCSFS_Student_Info_Dialog : public QWidget {
     Q_OBJECT
 
 private: 
-    QDialog     *parent;
+    QWidget     *parent;
 
     QLabel      *info_label;
 
+    OCSFS_Float_Widget *percent_info;
+
     QString     *client_id;
 
+    QVBoxLayout *layout;
+
 public: 
-    OCSFS_Student_Info_Dialog(QDialog *parent = nullptr);
+    OCSFS_Student_Info_Dialog(QWidget *parent = nullptr);
     ~OCSFS_Student_Info_Dialog();
 
-    bool set_status(const QString&);
-    
+    bool get_client_id(QString&);
+    bool set_client_id(const QString&);
+
+    void setText(const QString&);
 };
 
 #endif

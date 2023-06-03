@@ -46,7 +46,8 @@ OCSFS_Info_Dialog::OCSFS_Info_Dialog(QWidget *parent) {
 
     this->setLayout(this->layout);
 
-    this->stu_dialog_list = new QMap<QString, OCSFS_BarChartLabel*>();
+    // this->stu_dialog_list = new QMap<QString, OCSFS_BarChartLabel*>();
+    this->stu_dialog_list = new QMap<QString, OCSFS_Student_Info_Dialog*>();
 }
 
 OCSFS_Info_Dialog::~OCSFS_Info_Dialog() {
@@ -71,20 +72,17 @@ void OCSFS_Info_Dialog::have_user_status(QString &src_client_id, int &status_num
         return ;
     }
 
-    OCSFS_BarChartLabel *label = new OCSFS_BarChartLabel(src_client_id);
+    OCSFS_Student_Info_Dialog *label = new OCSFS_Student_Info_Dialog();
     label->setText(QString("学生: ") + src_client_id + 
         QString(" 状态: ") + status);
-    label->resize(190, 5);
+    label->set_client_id(src_client_id);
+    label->resize(190, 50);
 
     // 设置QLabel的样式
-    QString style = "QLabel {"
-                "background-color: gray;"
-                "color: black;"
-                "border: 1px solid gray;"
-                "border-radius: 5px;"
-                "}";
+    QString style = 
+        "border: 1px solid gray;"
+        "border-radius: 5px;";
     label->setStyleSheet(style);
-    // label->setStyleSheet("border: 1px solid blue;");
 
     // 设置QLabel的大小策略
     QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -92,18 +90,6 @@ void OCSFS_Info_Dialog::have_user_status(QString &src_client_id, int &status_num
     label->setSizePolicy(policy);
 
     this->layout->addWidget(label);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 
-        this->parent, SLOT(slot_mouse_enter(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_leave(const QString&)), 
-        this->parent, SLOT(slot_mouse_leave(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_press(const QString&)), 
-        this->parent, SLOT(slot_mouse_press(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_release(const QString&)), 
-        this->parent, SLOT(slot_mouse_release(const QString&)), Qt::AutoConnection);
 
     this->stu_dialog_list->insert(src_client_id, label);
 
@@ -124,9 +110,10 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
         return true;
     }
 
-    OCSFS_BarChartLabel *label = new OCSFS_BarChartLabel(client_id);
+    OCSFS_Student_Info_Dialog *label = new OCSFS_Student_Info_Dialog();
     label->setText(QString("学生: ") + client_id);
-    label->resize(190, 5);
+    label->set_client_id(client_id);
+    label->resize(190, 50);
 
     // 设置QLabel的样式
     QString style = "QLabel {"
@@ -136,7 +123,6 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
                 "border-radius: 5px;"
                 "}";
     label->setStyleSheet(style);
-    // label->setStyleSheet("border: 1px solid blue;");
 
     // 设置QLabel的大小策略
     QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -144,18 +130,6 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
     label->setSizePolicy(policy);
 
     this->layout->addWidget(label);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 
-        this->parent, SLOT(slot_mouse_enter(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_leave(const QString&)), 
-        this->parent, SLOT(slot_mouse_leave(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_press(const QString&)), 
-        this->parent, SLOT(slot_mouse_press(const QString&)), Qt::AutoConnection);
-    
-    QWidget::connect(label, SIGNAL(signal_mouse_release(const QString&)), 
-        this->parent, SLOT(slot_mouse_release(const QString&)), Qt::AutoConnection);
 
     this->stu_dialog_list->insert(client_id, label);
 

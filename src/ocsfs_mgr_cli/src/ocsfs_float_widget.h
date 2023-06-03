@@ -14,11 +14,12 @@
 #include <QObject>
 #include <QPainter>
 #include <QString>
+#include <QLabel>
 
 
 #include "ocsfs_define.h"
 
-class OCSFS_Float_Widget : public QWidget {
+class OCSFS_Float_Widget : public QLabel {
     Q_OBJECT
 private: 
     QWidget     *parent;

@@ -26,8 +26,8 @@ class OCSFS_Info_Dialog : public QDialog {
 private: 
     QWidget     *parent;
 
-    // QList<OCSFS_Student_Info_Dialog*>   *stu_dialog_list;
-    QMap<QString, OCSFS_BarChartLabel*>   *stu_dialog_list;
+    QMap<QString, OCSFS_Student_Info_Dialog*>   *stu_dialog_list;
+    // QMap<QString, OCSFS_BarChartLabel*>   *stu_dialog_list;
 
     QVBoxLayout *layout;
 private: 

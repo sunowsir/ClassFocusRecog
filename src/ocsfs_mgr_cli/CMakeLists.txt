@@ -33,7 +33,6 @@ add_executable(ocsfs_mgr_cli
     src/ocsfs_student_info_dialog.cpp
     src/ocsfs_barchar_label.cpp
     src/ocsfs_float_widget.cpp
-    # src/ocsfs_processthree_widget.cpp
     ${TS_FILES}
 )
 
