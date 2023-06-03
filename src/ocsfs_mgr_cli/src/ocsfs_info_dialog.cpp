@@ -41,6 +41,9 @@ bool OCSFS_Info_Dialog::student_status_get(int &status_num, QString &status) {
 OCSFS_Info_Dialog::OCSFS_Info_Dialog(QWidget *parent) {
     this->parent = parent;
     this->layout = new QVBoxLayout(this);
+    // 设置垂直布局的对齐方式
+    this->layout->setAlignment(Qt::AlignTop);
+
     this->setLayout(this->layout);
 
     this->stu_dialog_list = new QMap<QString, OCSFS_BarChartLabel*>();
@@ -72,6 +75,22 @@ void OCSFS_Info_Dialog::have_user_status(QString &src_client_id, int &status_num
     label->setText(QString("学生: ") + src_client_id + 
         QString(" 状态: ") + status);
     label->resize(190, 5);
+
+    // 设置QLabel的样式
+    QString style = "QLabel {"
+                "background-color: gray;"
+                "color: black;"
+                "border: 1px solid gray;"
+                "border-radius: 5px;"
+                "}";
+    label->setStyleSheet(style);
+    // label->setStyleSheet("border: 1px solid blue;");
+
+    // 设置QLabel的大小策略
+    QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    policy.setHeightForWidth(true);
+    label->setSizePolicy(policy);
+
     this->layout->addWidget(label);
     
     QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 
@@ -108,6 +127,22 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
     OCSFS_BarChartLabel *label = new OCSFS_BarChartLabel(client_id);
     label->setText(QString("学生: ") + client_id);
     label->resize(190, 5);
+
+    // 设置QLabel的样式
+    QString style = "QLabel {"
+                "background-color: gray;"
+                "color: black;"
+                "border: 1px solid gray;"
+                "border-radius: 5px;"
+                "}";
+    label->setStyleSheet(style);
+    // label->setStyleSheet("border: 1px solid blue;");
+
+    // 设置QLabel的大小策略
+    QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    policy.setHeightForWidth(true);
+    label->setSizePolicy(policy);
+
     this->layout->addWidget(label);
     
     QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 

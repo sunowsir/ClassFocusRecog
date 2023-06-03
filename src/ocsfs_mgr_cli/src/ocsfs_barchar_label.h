@@ -13,11 +13,13 @@
 #include <QLabel>
 #include <QWidget>
 #include <QString>
+#include <QMouseEvent>
+
 
 class OCSFS_BarChartLabel : public QLabel {
     Q_OBJECT
 
-    QString     *client_id;
+    QString                  *client_id;
 
 public:
     OCSFS_BarChartLabel(const QString&, QWidget *parent = nullptr); 

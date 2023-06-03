@@ -9,39 +9,46 @@
 #ifndef _OCSFS_FLOAT_WIDGET_H
 #define _OCSFS_FLOAT_WIDGET_H
 
+#include <QColor>
 #include <QWidget>
 #include <QObject>
-#include <QDialog>
-#include <QtCharts>
-#include <QVBoxLayout>
-#include <QtCharts/QPieSeries>
-#include <QtCharts/QPieSlice>
+#include <QPainter>
+#include <QString>
 
-class OCSFS_Float_Widget : public QDialog {
+
+#include "ocsfs_define.h"
+
+class OCSFS_Float_Widget : public QWidget {
     Q_OBJECT
 private: 
     QWidget     *parent;
 
-    /* 用来表示学生的积极状态百分比 */
-    QPieSlice   *active;
-    /* 用来表示学生的中性状态百分比 */
-    QPieSlice   *neutral;
-    /* 用来表示学生的消极状态百分比 */
-    QPieSlice   *negative;
+    double      active_percent;
+    double      neutral_percent;
+    double      negative_percent;
 
-    /* 将如上三片加入series组中 */
-    QPieSeries  *series;
+    QString     active_text;
+    QString     neutral_text;
+    QString     negative_text;
 
-    /* 饼图 */
-    QChart       *chart;
+    QColor      active_color;
+    QColor      neutral_color;
+    QColor      negative_color;
 
-    QChartView   *chartview;
+    QColor      active_text_color;
+    QColor      neutral_text_color;
+    QColor      negative_text_color;
 
 public : 
     OCSFS_Float_Widget(QWidget *parent = nullptr);
     ~OCSFS_Float_Widget();
 
-    bool set_percent(const int&, const int&, const int&);
+    bool set_percent(const double&, const double&, const double&);
+    bool set_color(const QColor&, const QColor&, const QColor&);
+    bool set_text_color(const QColor&, const QColor&, const QColor&);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 public slots: 
     void slot_show_widget();

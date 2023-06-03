@@ -14,6 +14,7 @@
 #include <QDialog>
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QMouseEvent>
 
 #include "ocsfs_student_info_dialog.h"
 #include "ocsfs_define.h"

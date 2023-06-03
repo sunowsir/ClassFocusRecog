@@ -17,6 +17,7 @@
 #include <QSettings>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -33,6 +34,8 @@
 #include "ocsfs_float_widget.h"
 #include "ocsfs_pic_show_dialog.h"
 #include "ocsfs_interactive_dialog.h"
+
+#include <QToolTip>
 
 class OCSFS_Widget: public QWidget {
     Q_OBJECT

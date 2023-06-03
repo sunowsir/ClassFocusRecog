@@ -10,83 +10,115 @@
 
 OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) : 
     parent(parent) {
+    this->resize(OCSFS_PROGRESS_Width, OCSFS_PROGRESS_Height);
 
-    this->active = new QPieSlice(this);
-    this->active->setLabel(QString("积极"));
-    this->active->setValue(40);
-    this->active->setBrush(Qt::green);
-    this->active->setLabelVisible(true);
-
-    this->neutral = new QPieSlice(this);
-    this->neutral->setLabel(QString("中性"));
-    this->neutral->setValue(30);
-    this->neutral->setBrush(Qt::yellow);
-    this->neutral->setLabelVisible(true);
-
-    this->negative = new QPieSlice(this);
-    this->neutral->setLabel(QString("消极"));
-    this->neutral->setValue(30);
-    this->negative->setBrush(Qt::red);
-    this->negative->setLabelVisible(true);
-
-    this->series = new QPieSeries(this);
-    /* 添加三个片区到组里 */
-    this->series->append(this->active);
-    this->series->append(this->neutral);
-    this->series->append(this->negative);
-
-    this->chart = new QChart();
-    /* 添加组 */
-    this->chart->addSeries(this->series);
-    /* 显示实时动画效果 */
-    this->chart->setAnimationOptions(QChart::AllAnimations);
-
-    this->chartview = new QChartView(this);
-    this->chartview->setChart(this->chart);
-    this->chartview->hide();
+    // 设置窗口大小策略为可变大小
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     /* 无边框 */
     this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
+    this->setAttribute(Qt::WA_TranslucentBackground, true);
+
+    this->active_percent = 0.3;
+    this->neutral_percent = 0.3;
+    this->negative_percent = 0.4;
+
+    this->active_text = QString(tr("积极:") + QString::number(this->active_percent * 100) + "%");
+    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent * 100) + "%");
+    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent * 100) + "%");
+
+    this->active_color  = Qt::green;
+    this->neutral_color = Qt::yellow;
+    this->negative_color = Qt::red;
+
+    this->active_text_color = Qt::white;
+    this->neutral_text_color = Qt::black;
+    this->negative_text_color = Qt::black;
 
     this->hide();
 }
 
 OCSFS_Float_Widget::~OCSFS_Float_Widget() {
-    delete this->active;
-    delete this->neutral;
-    delete this->negative;
-    delete this->series;
-    delete this->chart;
-    delete this->chartview;
-    // delete this->layout;
 }
 
 
-bool OCSFS_Float_Widget::set_percent(const int &active_percent, 
-    const int &neutral_percent, 
-    const int &negative_percent) {
+bool OCSFS_Float_Widget::set_percent(const double &active_percent, 
+    const double &neutral_percent, 
+    const double &negative_percent) {
     int total_percent = active_percent + neutral_percent + negative_percent;
-    if (100 != total_percent) {
+    if (1 != total_percent) {
         qDebug() << "percent error: active_percent: " << active_percent 
             << "neutral_percent: " << neutral_percent
             << "negative_percent: " << negative_percent;
         return false;
     }
 
-    this->series->slices().at(0)->setValue(active_percent);
-    this->series->slices().at(1)->setValue(neutral_percent);
-    this->series->slices().at(2)->setValue(negative_percent);
+    this->active_percent = active_percent;
+    this->neutral_percent = neutral_percent;
+    this->negative_percent = negative_percent;
+
+    this->active_text = QString(tr("积极:") + QString::number(this->active_percent * 100) + "%");
+    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent * 100) + "%");
+    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent * 100) + "%");
 
     return true;
 }
 
+bool OCSFS_Float_Widget::set_color(const QColor &active_color, 
+    const QColor &neutral_color, 
+    const QColor &negative_color) {
+
+    this->active_color = active_color;
+    this->neutral_color = neutral_color;
+    this->negative_color = negative_color;
+
+    return true;
+}
+
+bool OCSFS_Float_Widget::set_text_color(const QColor &active_text_color, 
+    const QColor &neutral_text_color, 
+    const QColor &negative_text_color) {
+
+    this->active_text_color = active_text_color;
+    this->neutral_text_color = neutral_text_color;
+    this->negative_text_color = negative_text_color;
+
+    return true;
+}
+
+void OCSFS_Float_Widget::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    painter.setPen(Qt::NoPen);
+
+    int width = this->width();
+    int height = this->height();
+
+    int active_width = width * this->active_percent;
+    int neutral_width = width * this->neutral_percent;
+    int negative_width = width * this->negative_percent;
+
+    painter.fillRect(0, 0, active_width, height, this->active_color);
+    painter.setPen(this->active_text_color);
+    painter.drawText(QRectF(0, 
+        0, active_width, this->height()), Qt::AlignCenter, this->active_text);
+
+    painter.fillRect(active_width, 0, neutral_width, height, this->neutral_color);
+    painter.setPen(this->neutral_text_color);
+    painter.drawText(QRectF(active_width, 
+        0, neutral_width, this->height()), Qt::AlignCenter, this->neutral_text);
+
+    painter.fillRect(active_width + neutral_width, 0, negative_width, height, this->negative_color);
+    painter.setPen(this->negative_text_color);
+    painter.drawText(QRectF(active_width + neutral_width, 
+        0, negative_width, this->height()), Qt::AlignCenter, this->negative_text);
+}
+
 void OCSFS_Float_Widget::slot_show_widget() {
-    this->chartview->show();
     this->show();
 }
 
 void OCSFS_Float_Widget::slot_hide_widget() {
-    this->chartview->hide();
     this->hide();
 }
 

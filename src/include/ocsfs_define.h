@@ -87,7 +87,9 @@
 #define OCSFS_TRAIN_IMGS_NUM   (50)
 
 
-
 #define OCSFS_MGR_STU_INFO_DIALOG_HIGH (5)
+
+#define OCSFS_PROGRESS_Width   (300)
+#define OCSFS_PROGRESS_Height  (25)
 
 #endif

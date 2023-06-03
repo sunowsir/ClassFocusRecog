@@ -43,17 +43,8 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     /* 网格布局 */
     this->layout = new QGridLayout(this);
 
-    /* 学生信息区域 */
-    this->info_area = new OCSFS_Info_Dialog(this);
-    /* 滚轮 */
-    this->info_scrollarea = new QScrollArea(this);
-
-    this->info_scrollarea->setWidgetResizable(true);
-    this->info_scrollarea->setAlignment(Qt::AlignRight);
-    this->info_scrollarea->setWidget(this->info_area);
-
-    this->layout->addWidget(this->info_scrollarea, 0, 1, 1, 1);
-    // this->layout->addWidget(this->info_area, 0, 1, 1, 1);
+    int row_count = layout->rowCount(); // 获取网格布局的总行数
+    int current_row = layout->rowCount() - 1; // 获取当前行数
     
     /* 图像展示区域 */
     this->picture_area = new OCSFS_Pic_Show_Dialog(this);
@@ -63,11 +54,23 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->interactive_area = new OCSFS_Interactive_Dialog(this);
     this->layout->addWidget(this->interactive_area, 1, 0);
 
+    /* 学生信息区域 */
+    this->info_area = new OCSFS_Info_Dialog(this);
+    /* 滚轮 */
+    this->info_scrollarea = new QScrollArea(this);
+    this->info_scrollarea->setWidgetResizable(true);
+    this->info_scrollarea->setAlignment(Qt::AlignRight);
+    this->info_scrollarea->setWidget(this->info_area);
+    // this->layout->addWidget(this->info_scrollarea, current_row + 1, 1, row_count - current_row + 1, 1);
+    this->layout->addWidget(this->info_scrollarea, 0, 1, 2, 1);
+    // this->layout->addWidget(this->info_area, 0, 1, 1, 1);
+
     this->layout->setColumnStretch(0, 2);
     this->layout->setColumnStretch(1, 1);
     this->layout->setRowStretch(0, 2);
     this->layout->setRowStretch(1, 1);
 
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->setLayout(this->layout);
 
     this->show_student_id = new QString();
@@ -194,17 +197,17 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     this->status_map->insert(src_client_id, status);
 
     /* 计算百分比并丢给界面去显示 */
-    int active_percent = 0; 
+    double active_percent = 0; 
     if (total_num != 0)
-        active_percent = (active_num / total_num) * 100;
+        active_percent = (double)active_num / total_num;
 
-    int neutral_percent = 0; 
+    double neutral_percent = 0; 
     if (total_num != 0)
-        neutral_percent = (neutral_num / total_num) * 100;
+        neutral_percent = (double)neutral_num / total_num;
 
-    int negative_percent = 0; 
+    double negative_percent = 0; 
     if (total_num != 0)
-        negative_percent = (negative_num / total_num) * 100;
+        negative_percent = (double)negative_num / total_num;
 
     this->float_pie->set_percent(active_percent, 
         neutral_percent, negative_percent);
@@ -234,6 +237,7 @@ void OCSFS_Widget::have_user_ready(QString &src_client_id) {
 /* 鼠标悬浮 */
 void OCSFS_Widget::slot_mouse_enter(const QString &client_id) {
     this->float_pie->slot_show_widget();
+
 }
 
 /* 鼠标离开 */
