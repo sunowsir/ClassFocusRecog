@@ -16,6 +16,8 @@
 #include <QString>
 #include <QLabel>
 
+#include <sstream>
+
 
 #include "ocsfs_define.h"
 
@@ -24,9 +26,9 @@ class OCSFS_Float_Widget : public QLabel {
 private: 
     QWidget     *parent;
 
-    double      active_percent;
-    double      neutral_percent;
-    double      negative_percent;
+    int      active_percent;
+    int      neutral_percent;
+    int      negative_percent;
 
     QString     active_text;
     QString     neutral_text;
@@ -44,7 +46,7 @@ public :
     OCSFS_Float_Widget(QWidget *parent = nullptr);
     ~OCSFS_Float_Widget();
 
-    bool set_percent(const double&, const double&, const double&);
+    bool set_percent(const int&, const int&, const int&);
     bool set_color(const QColor&, const QColor&, const QColor&);
     bool set_text_color(const QColor&, const QColor&, const QColor&);
 

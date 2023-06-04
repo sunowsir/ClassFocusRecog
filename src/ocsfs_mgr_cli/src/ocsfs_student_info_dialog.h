@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <QString>
 #include <QVBoxLayout>
+#include <QMouseEvent>
 
 #include "ocsfs_float_widget.h"
 
@@ -39,6 +40,18 @@ public:
     bool set_client_id(const QString&);
 
     void setText(const QString&);
+
+protected:
+    bool event(QEvent *event) override;
+
+signals: 
+    void signal_mouse_enter(const QString&);
+    void signal_mouse_leave(const QString&);
+    void signal_mouse_press(const QString&);
+    void signal_mouse_release(const QString&);
+
+public slots: 
+    void set_info_percent(const int&, const int&, const int&);
 };
 
 #endif

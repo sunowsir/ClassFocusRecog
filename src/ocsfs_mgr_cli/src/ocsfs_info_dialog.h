@@ -41,6 +41,7 @@ public:
 
 signals:
     void signal_have_user_status_image(QString&, QImage&);
+    void set_info_percent(const int&, const int&, const int&);
 
 public slots: 
     bool add_student_label(const QString &);

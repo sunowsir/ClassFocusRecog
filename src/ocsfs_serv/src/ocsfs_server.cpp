@@ -123,22 +123,30 @@ void OCSFS_Server::have_mgr_check_in(const QString &src_client_id) {
 /* 有教师发起点名: 教师发起点名应当发给目的学生端 */
 void OCSFS_Server::have_mgr_roll_call(const QString &src_client_id, 
     const QString &dst_client_id) {
-    for (auto user_cli : *(this->user_clients)) {
-        QString client_id;
-        user_cli->get_client_id(client_id);
-        if (client_id != dst_client_id)
-            continue;
+    // for (auto user_cli : *(this->user_clients)) {
+    //     QString client_id;
+    //     user_cli->get_client_id(client_id);
+    //     if (client_id != dst_client_id)
+    //         continue;
+    //     user_cli->send_have_mgr_roll_call(src_client_id);
+    // }
+    if (this->user_clients->contains(dst_client_id)) {
+        auto user_cli = (*this->user_clients)[dst_client_id];
         user_cli->send_have_mgr_roll_call(src_client_id);
     }
 }
 
 void OCSFS_Server::have_mgr_warning(const QString &src_client_id, 
     const QString &dst_client_id) {
-    for (auto user_cli : *(this->user_clients)) {
-        QString client_id;
-        user_cli->get_client_id(client_id);
-        if (client_id != dst_client_id)
-            continue;
+    // for (auto user_cli : *(this->user_clients)) {
+    //     QString client_id;
+    //     user_cli->get_client_id(client_id);
+    //     if (client_id != dst_client_id)
+    //         continue;
+    //     user_cli->send_have_mgr_warning(src_client_id);
+    // }
+    if (this->user_clients->contains(dst_client_id)) {
+        auto user_cli = (*this->user_clients)[dst_client_id];
         user_cli->send_have_mgr_warning(src_client_id);
     }
 }

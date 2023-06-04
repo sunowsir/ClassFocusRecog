@@ -25,6 +25,9 @@ bool OCSFS_Widget::student_status_type_get(int &status_num, int &status_type) {
         case OCSFS_face_ANGRY : {
             status_type = OCSFS_STATUS_TYPE_negative;
         } break;
+        case 0: {
+            status_type = OCSFS_STATUS_TYPE_negative;
+        }
         default: {
             status_type = -1;
         }
@@ -121,6 +124,7 @@ void OCSFS_Widget::have_user_warning_res(QString &src_client_id) {
 
 /* 收到学生状态 */
 void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
+    // qDebug() << "src_client_id: " << src_client_id << "status_num: " << status_num;
     int status_type;
     /* 将面部状态对应成听课状态 */
     this->student_status_type_get(status_num, status_type);
@@ -178,12 +182,15 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     switch(status_type) {
         case OCSFS_STATUS_TYPE_active : {
             active_num++;
+            active_num %= 1000000;
         } break;
         case OCSFS_STATUS_TYPE_neutral : {
             neutral_num++;
+            neutral_num %= 1000000;
         } break;
         case OCSFS_STATUS_TYPE_negative : {
             negative_num++;
+            negative_num %= 1000000;
         } break;
         default: {
             qDebug() << "status_type: " << status_type << ", error";
@@ -191,26 +198,38 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
         }
     }
 
+    qDebug() << "active_num: " << active_num << 
+        "neutral_num: " << neutral_num << 
+        "negative_num: " << negative_num;
+
     uint64_t total_num = active_num + neutral_num + negative_num;
 
     /* 保存 */
     this->status_map->insert(src_client_id, status);
 
     /* 计算百分比并丢给界面去显示 */
-    double active_percent = 0; 
+    int active_percent = 0; 
     if (total_num != 0)
-        active_percent = (double)active_num / total_num;
+        active_percent = ((double)active_num / (double)total_num) * 100;
 
-    double neutral_percent = 0; 
+    int neutral_percent = 0; 
     if (total_num != 0)
-        neutral_percent = (double)neutral_num / total_num;
+        neutral_percent = ((double)neutral_num / (double)total_num) * 100;
 
-    double negative_percent = 0; 
+    int negative_percent = 0; 
     if (total_num != 0)
-        negative_percent = (double)negative_num / total_num;
+        negative_percent = 100 - active_percent - neutral_percent;
 
-    // this->float_pie->set_percent(active_percent, 
-    //     neutral_percent, negative_percent);
+    // qDebug() << "active_num: " << active_num << 
+    //     "neutral_num: " << neutral_num << 
+    //     "negative_num: " << negative_num;
+
+    // qDebug() << "active_percent: " << active_percent << 
+    //     "neutral_percent: " << neutral_percent << 
+    //     "negative_percent: " << negative_percent;
+
+    this->info_area->set_info_percent(active_percent, 
+        neutral_percent, negative_percent);
 
     return ;
 }

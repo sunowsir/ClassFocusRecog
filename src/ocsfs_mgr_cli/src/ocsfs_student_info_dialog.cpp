@@ -64,3 +64,36 @@ bool OCSFS_Student_Info_Dialog::set_client_id(const QString &client_id) {
 void OCSFS_Student_Info_Dialog::setText(const QString &text) {
     this->info_label->setText(text);
 }
+
+bool OCSFS_Student_Info_Dialog::event(QEvent *event) {
+    switch (event->type()) {
+        /* 悬停 */
+        case QEvent::Enter: {
+            this->signal_mouse_enter(*this->client_id);
+        } break;
+
+        /* 离开 */
+        case QEvent::Leave: {
+            this->signal_mouse_leave(*this->client_id);
+        } break;
+
+        /* 点击 */
+        case QEvent::MouseButtonPress: {
+            this->signal_mouse_press(*this->client_id);
+        } break;
+
+        /* 松开 */
+        case QEvent::MouseButtonRelease: {
+            this->signal_mouse_release(*this->client_id);
+        } break;
+        default:
+            break;
+    }
+    return QWidget::event(event);
+}
+
+void OCSFS_Student_Info_Dialog::set_info_percent(const int &active_percent, 
+    const int &neutral_percent, 
+    const int &negative_percent) {
+    this->percent_info->set_percent(active_percent, neutral_percent, negative_percent);
+}

@@ -31,6 +31,9 @@ bool OCSFS_Info_Dialog::student_status_get(int &status_num, QString &status) {
         case OCSFS_face_YAWN : {
             status = QString("哈欠");
         } break;
+        case 0 : {
+            status = QString("无人脸");
+        }
         default: {
             status = QString("未知");
         }
@@ -60,13 +63,19 @@ void OCSFS_Info_Dialog::have_user_status(QString &src_client_id, int &status_num
     QString status;
     this->student_status_get(status_num, status);
 
+    // for (auto stu_info: *(this->stu_dialog_list)) {
+    //     QString now_client_id;
+    //     stu_info->get_client_id(now_client_id);
+    //     if (now_client_id != src_client_id)
+    //         continue;
 
-    for (auto stu_info: *(this->stu_dialog_list)) {
-        QString now_client_id;
-        stu_info->get_client_id(now_client_id);
-        if (now_client_id != src_client_id)
-            continue;
+    //     stu_info->setText(QString("学生: ") + src_client_id  + 
+    //         QString(" 状态: ") + status);
+    //     return ;
+    // }
 
+    if (this->stu_dialog_list->contains(src_client_id))  {
+        auto stu_info = (*this->stu_dialog_list)[src_client_id];
         stu_info->setText(QString("学生: ") + src_client_id  + 
             QString(" 状态: ") + status);
         return ;
@@ -89,6 +98,21 @@ void OCSFS_Info_Dialog::have_user_status(QString &src_client_id, int &status_num
     policy.setHeightForWidth(true);
     label->setSizePolicy(policy);
 
+    QWidget::connect(this, SIGNAL(set_info_percent(const int&, const int&, const int&)), 
+        label, SLOT(set_info_percent(const int&, const int&, const int&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 
+        this->parent, SLOT(slot_mouse_enter(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_leave(const QString&)), 
+        this->parent, SLOT(slot_mouse_leave(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_press(const QString&)), 
+        this->parent, SLOT(slot_mouse_press(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_release(const QString&)), 
+        this->parent, SLOT(slot_mouse_release(const QString&)), Qt::AutoConnection);
+
     this->layout->addWidget(label);
 
     this->stu_dialog_list->insert(src_client_id, label);
@@ -100,11 +124,18 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
     if (this->stu_dialog_list->contains(client_id))
         return true;
 
-    for (auto stu_info: *(this->stu_dialog_list)) {
-        QString now_client_id;
-        stu_info->get_client_id(now_client_id);
-        if (now_client_id != QString("0000000000"))
-            continue;
+    // for (auto stu_info: *(this->stu_dialog_list)) {
+    //     QString now_client_id;
+    //     stu_info->get_client_id(now_client_id);
+    //     if (now_client_id != QString("0000000000"))
+    //         continue;
+    //     stu_info->set_client_id(client_id);
+    //     stu_info->setText(QString("学生: ") + client_id);
+    //     return true;
+    // }
+
+    if (this->stu_dialog_list->contains(client_id)) {
+        auto stu_info = (*this->stu_dialog_list)[client_id];
         stu_info->set_client_id(client_id);
         stu_info->setText(QString("学生: ") + client_id);
         return true;
@@ -128,6 +159,21 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
     QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     policy.setHeightForWidth(true);
     label->setSizePolicy(policy);
+
+    QWidget::connect(this, SIGNAL(set_info_percent(const int&, const int&, const int&)), 
+        label, SLOT(set_info_percent(const int&, const int&, const int&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_enter(const QString&)), 
+        this->parent, SLOT(slot_mouse_enter(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_leave(const QString&)), 
+        this->parent, SLOT(slot_mouse_leave(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_press(const QString&)), 
+        this->parent, SLOT(slot_mouse_press(const QString&)), Qt::AutoConnection);
+
+    QWidget::connect(label, SIGNAL(signal_mouse_release(const QString&)), 
+        this->parent, SLOT(slot_mouse_release(const QString&)), Qt::AutoConnection);
 
     this->layout->addWidget(label);
 

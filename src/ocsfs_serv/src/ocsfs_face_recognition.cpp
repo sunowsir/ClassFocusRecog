@@ -74,7 +74,7 @@ bool OCSFS_Face_Recognition::cv_recognize(cv::Mat &frame,
     /* 检测人脸 */
     this->faceDetector.detectMultiScale(gray, cv_faces);
     if (0 == cv_faces.size()) 
-        qDebug() << "no face";
+        return false;
 
     /* dlib的matrix */
     dlib::array2d<dlib::bgr_pixel> dimg;
@@ -101,10 +101,8 @@ bool OCSFS_Face_Recognition::cv_recognize(cv::Mat &frame,
     }
     // cv::imwrite("./1.jpg", frame);
 
-    if (shapes.empty()) {
-        qDebug() << "shapes is empty";
+    if (shapes.empty()) 
         return false;
-    }
     
     return true;
 }

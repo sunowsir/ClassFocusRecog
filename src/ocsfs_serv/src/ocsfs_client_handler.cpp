@@ -45,7 +45,6 @@ bool OCSFS_Client_Handler::get_client_id(QString &client_id) {
 
 void OCSFS_Client_Handler::send_recognize_result(const QString& src_client_id, 
     const QString& result) {
-    qDebug() << "will send " << src_client_id << " status result: " << result;
     this->send_data(src_client_id, this->client_id, result);
 }
 
@@ -163,27 +162,33 @@ bool OCSFS_Client_Handler::step2_handler(const QString &src_client_id,
     recv_image.loadFromData(recv_data);
 
     this->ser->recognize(recv_image, out_image, face_type);
-    QString face_type_str = "result: ";
-    switch(face_type) {
-        case OCSFS_face_COMM: {
-            face_type_str += "平静";
-        } break;
-        case OCSFS_face_HAPPY: {
-            face_type_str += "高兴";
-        } break;
-        case OCSFS_face_HADE: {
-            face_type_str += "厌恶";
-        } break;
-        default: {
-            if (this->opr->recognize(recv_image)) {
-                face_type = OCSFS_head_PROFILE;
-                face_type_str += "侧脸";
-            } else 
-                face_type_str += "unknow";
-        }
+    // QString face_type_str = "result: ";
+    // switch(face_type) {
+    //     case OCSFS_face_COMM: {
+    //         face_type_str += "平静";
+    //     } break;
+    //     case OCSFS_face_HAPPY: {
+    //         face_type_str += "高兴";
+    //     } break;
+    //     case OCSFS_face_HADE: {
+    //         face_type_str += "厌恶";
+    //     } break;
+    //     default: {
+    //         if (this->opr->recognize(recv_image)) {
+    //             face_type = OCSFS_head_PROFILE;
+    //             face_type_str += "侧脸";
+    //         } else 
+    //             face_type_str += "unknow";
+    //     }
+    // }
+    // face_type_str += "(" + QString::number(face_type) + ")";
+    // qDebug() << "服务器识别结果：" << this->client_id << ": " << face_type_str;
+    //
+    if ((0 == face_type) && (this->opr->recognize(recv_image))) {
+        face_type = OCSFS_head_PROFILE;
     }
-    face_type_str += "(" + QString::number(face_type) + ")";
-    qDebug() << "服务器识别结果：" << this->client_id << ": " << face_type_str;
+
+    qDebug() << "client_id: " << this->client_id << "face_type: " << face_type;
 
     /* 当处理完学生端发来的图片，得到状态结果后，
      * 调用这个信号函数，把结果丢进去 */

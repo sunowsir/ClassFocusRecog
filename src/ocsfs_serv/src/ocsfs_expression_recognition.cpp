@@ -26,6 +26,7 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, QImage& out_img,
     cv::Mat frame;
     if (!sic.qimage_2_mat(img, frame)) {
         qDebug() << "convert QImage to mat failed.";
+        face_type = 0;
         return false;
     }
 
@@ -37,7 +38,7 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, QImage& out_img,
     
     /* 开始识别 */
     if (false == this->sfr->recognize(frame, faces, shapes)) {
-        qDebug() << "sfr.recognize failed.";
+        face_type = 0;
         return false;
     }
 
@@ -63,6 +64,7 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, QImage& out_img,
 
     if (!sic.mat_2_qimage(frame, out_img)) {
         qDebug() << "convert mat to QImage failed.";
+        face_type = 0;
         return false;
     }
 

@@ -19,13 +19,13 @@ OCSFS_Float_Widget::OCSFS_Float_Widget(QWidget *parent) :
     // this->setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint);
     // this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-    this->active_percent = 0.3;
-    this->neutral_percent = 0.3;
-    this->negative_percent = 0.4;
+    this->active_percent = 30;
+    this->neutral_percent = 30;
+    this->negative_percent = 40;
 
-    this->active_text = QString(tr("积极:") + QString::number(this->active_percent * 100) + "%");
-    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent * 100) + "%");
-    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent * 100) + "%");
+    this->active_text = QString(tr("积极:") + QString::number(this->active_percent) + "%");
+    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent) + "%");
+    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent) + "%");
 
     this->active_color  = Qt::green;
     this->neutral_color = Qt::yellow;
@@ -40,11 +40,11 @@ OCSFS_Float_Widget::~OCSFS_Float_Widget() {
 }
 
 
-bool OCSFS_Float_Widget::set_percent(const double &active_percent, 
-    const double &neutral_percent, 
-    const double &negative_percent) {
+bool OCSFS_Float_Widget::set_percent(const int &active_percent, 
+    const int &neutral_percent, 
+    const int &negative_percent) {
     int total_percent = active_percent + neutral_percent + negative_percent;
-    if (1 != total_percent) {
+    if (100 != total_percent) {
         qDebug() << "percent error: active_percent: " << active_percent 
             << "neutral_percent: " << neutral_percent
             << "negative_percent: " << negative_percent;
@@ -55,9 +55,11 @@ bool OCSFS_Float_Widget::set_percent(const double &active_percent,
     this->neutral_percent = neutral_percent;
     this->negative_percent = negative_percent;
 
-    this->active_text = QString(tr("积极:") + QString::number(this->active_percent * 100) + "%");
-    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent * 100) + "%");
-    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent * 100) + "%");
+    this->active_text = QString(tr("积极:") + QString::number(this->active_percent) + "%");
+    this->neutral_text = QString(tr("中性:") + QString::number(this->neutral_percent) + "%");
+    this->negative_text = QString(tr("消极:") + QString::number(this->negative_percent) + "%");
+
+    this->update();
 
     return true;
 }
@@ -92,9 +94,9 @@ void OCSFS_Float_Widget::paintEvent(QPaintEvent *event) {
     int width = this->width();
     int height = this->height();
 
-    int active_width = width * this->active_percent;
-    int neutral_width = width * this->neutral_percent;
-    int negative_width = width * this->negative_percent;
+    int active_width = (double)width * ((double)this->active_percent / 100.0);
+    int neutral_width = (double)width * ((double)this->neutral_percent / 100.0);
+    int negative_width = (double)width * ((double)this->negative_percent / 100.0);
 
     painter.fillRect(0, 0, active_width, height, this->active_color);
     painter.setPen(this->active_text_color);
@@ -110,14 +112,6 @@ void OCSFS_Float_Widget::paintEvent(QPaintEvent *event) {
     painter.setPen(this->negative_text_color);
     painter.drawText(QRectF(active_width + neutral_width, 
         0, negative_width, this->height()), Qt::AlignCenter, this->negative_text);
-
-    // 设置QLabel的样式
-    QString style = "QLabel {"
-                "border: 1px solid gray;"
-                "border-radius: 5px;"
-                "}";
-    this->setStyleSheet(style);
-
 }
 
 void OCSFS_Float_Widget::slot_show_widget() {
