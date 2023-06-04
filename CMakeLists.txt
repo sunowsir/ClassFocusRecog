@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall")
 
+set(CMAKE_AUTOMOC_MOC_OPTIONS ${CMAKE_AUTOMOC_MOC_OPTIONS} -no-direct-extern-access)
+
 find_package(Qt6 COMPONENTS Widgets LinguistTools REQUIRED)
 find_package(Qt6 COMPONENTS Multimedia MultimediaWidgets Charts REQUIRED)
 
@@ -24,9 +26,9 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/include
 )
 
-# add_subdirectory(src/ocsfs_serv)
+add_subdirectory(src/ocsfs_serv)
 # add_subdirectory(src/ocsfs_mgr_cli)
-# add_subdirectory(src/ocsfs_user_cli)
+add_subdirectory(src/ocsfs_user_cli)
 # add_subdirectory(src/module_train_tool)
 add_subdirectory(src/demo)
 

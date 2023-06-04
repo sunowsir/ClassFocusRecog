@@ -162,6 +162,7 @@ void OCSFS_Widget::slots_open_camera() {
         QMessageBox::critical(this, tr("错误"), tr("未选择摄像头"));
         return ;
     }
+    QMessageBox::warning(this, tr("警告"), tr("请注意听课状态状态!"));
 
     /* 显示摄像头的实时图像 */
     if (this->camera_view->isHidden())

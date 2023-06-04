@@ -14,6 +14,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/demo)
 
 set(TS_FILES OCSFS_zh_CN.ts)
 
+set(CMAKE_AUTOMOC_MOC_OPTIONS ${CMAKE_AUTOMOC_MOC_OPTIONS} -no-direct-extern-access)
+
 include_directories(
     ${PROJECT_SOURCE_DIR}
     ${OpenCV_INCLUDE_DIRS}
