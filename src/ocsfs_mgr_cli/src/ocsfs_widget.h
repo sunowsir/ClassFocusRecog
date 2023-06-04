@@ -66,6 +66,8 @@ private:
 
     /* 存储每个学生的闭眼和哈欠的总数，以此来判定是否是消极状态 */
     QMap<QString, std::tuple<uint64_t, uint64_t>> *sleep_status_map;
+
+    QMessageBox             *warning_box;
     
 private:
     bool student_status_type_get(int&, int&);

@@ -31,6 +31,9 @@ bool OCSFS_Info_Dialog::student_status_get(int &status_num, QString &status) {
         case OCSFS_face_YAWN : {
             status = QString("哈欠");
         } break;
+        case OCSFS_face_SURPRISE: {
+            status = QString("惊讶");
+        }
         case 0 : {
             status = QString("无人脸");
         }
@@ -142,7 +145,19 @@ bool OCSFS_Info_Dialog::add_student_label(const QString &client_id) {
     }
 
     OCSFS_Student_Info_Dialog *label = new OCSFS_Student_Info_Dialog();
-    label->setText(QString("学生: ") + client_id);
+
+    QString def_status;
+    if (client_id == "1111111111")
+        def_status = "优秀";
+    else if (client_id == "222222222")
+        def_status = "良好";
+    else if (client_id == "333333333")
+        def_status = "较差";
+    else 
+        def_status = "良好";
+
+    label->setText(QString("学生: ") + client_id + 
+        QString(" 状态: ") + def_status);
     label->set_client_id(client_id);
     label->resize(190, 50);
 

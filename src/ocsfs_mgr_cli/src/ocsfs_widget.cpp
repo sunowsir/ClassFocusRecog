@@ -25,11 +25,14 @@ bool OCSFS_Widget::student_status_type_get(int &status_num, int &status_type) {
         case OCSFS_face_ANGRY : {
             status_type = OCSFS_STATUS_TYPE_negative;
         } break;
+        case OCSFS_face_SURPRISE : {
+            status_type = OCSFS_STATUS_TYPE_active;
+        }
         case 0: {
             status_type = OCSFS_STATUS_TYPE_negative;
         }
         default: {
-            status_type = -1;
+            status_type = OCSFS_STATUS_TYPE_negative;
         }
     }
     return true;
@@ -46,9 +49,6 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     /* 网格布局 */
     this->layout = new QGridLayout(this);
 
-    int row_count = layout->rowCount(); // 获取网格布局的总行数
-    int current_row = layout->rowCount() - 1; // 获取当前行数
-    
     /* 图像展示区域 */
     this->picture_area = new OCSFS_Pic_Show_Dialog(this);
     this->layout->addWidget(this->picture_area, 0, 0);
@@ -82,6 +82,18 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
 
     this->status_map = new QMap<QString, std::tuple<uint64_t, uint64_t, uint64_t>>();
     this->sleep_status_map = new QMap<QString, std::tuple<uint64_t, uint64_t>>();
+
+    // this->warning_box = new QMessageBox(this);
+    // this->warning_box->setWindowTitle("提醒");
+
+    // this->warning_box->setText("");
+    // this->warning_box->setInformativeText("学生状态异常，是否提醒？");
+
+    // this->warning_box->setStandardButtons(QMessageBox::Ok);
+    // this->warning_box->setWindowModality(Qt::NonModal);
+
+    // QWidget::connect(this->warning_box, SIGNAL(buttonClicked()), 
+    //     this->);
 
     return ;
 }

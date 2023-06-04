@@ -64,6 +64,9 @@ private:
 private: 
     /* 采集特征点，并根据特征点计算特征向量，保存特征向量到数据集中 */
     bool capture_and_save_keypoint(cv::Mat&, unsigned int&);
+
+    bool student_status_get(const int&, QString&);
+
 public: 
 
     OCSFS_Module_Trainer(int /* type num */, int /* img num */);

@@ -239,15 +239,15 @@ void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) 
         return ;
     }
 
-    /* 将结果画到图片上 */
-    cv::Point org(50, 50);
-    int fontFace = cv::FONT_HERSHEY_SIMPLEX;
-    double fontScale = 1.0;
-    cv::Scalar color(0, 0, 255);
-    int thickness = 2;
-    putText(mat_out_img, 
-        face_type_str.toStdString(), 
-        org, fontFace, fontScale, color, thickness);
+    // /* 将结果画到图片上 */
+    // cv::Point org(50, 50);
+    // int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+    // double fontScale = 1.0;
+    // cv::Scalar color(0, 0, 255);
+    // int thickness = 2;
+    // putText(mat_out_img, 
+    //     face_type_str.toStdString(), 
+    //     org, fontFace, fontScale, color, thickness);
 
 
     /* 获取当前时间戳 */

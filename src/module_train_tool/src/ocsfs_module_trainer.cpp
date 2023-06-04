@@ -38,6 +38,42 @@ bool OCSFS_Module_Trainer::capture_and_save_keypoint(cv::Mat& frame, unsigned in
     return true;
 }
 
+bool OCSFS_Module_Trainer::student_status_get(const int &status_num, QString &status) {
+    switch(status_num) {
+        case OCSFS_head_PROFILE : {
+            status = QString("侧脸");
+        } break;
+        case OCSFS_face_COMM : {
+            status = QString("平静");
+        } break;
+        case OCSFS_face_HAPPY : {
+            status = QString("高兴");
+        } break;
+        case OCSFS_face_HADE : {
+            status = QString("厌恶");
+        } break;
+        case OCSFS_face_ANGRY : {
+            status = QString("生气");
+        } break;
+        case OCSFS_face_CLOSEEYES : {
+            status = QString("闭眼");
+        } break;
+        case OCSFS_face_YAWN : {
+            status = QString("哈欠");
+        } break;
+        case OCSFS_face_SURPRISE: {
+            status = QString("惊讶");
+        }
+        case 0 : {
+            status = QString("无人脸");
+        }
+        default: {
+            status = QString("未知");
+        }
+    }
+    return true;
+}
+
 OCSFS_Module_Trainer::OCSFS_Module_Trainer(int tnum, int inum) {
     if (tnum <= 0) {
         qDebug() << "type_num <= 0";
@@ -90,25 +126,15 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
         *pixel_ptr = face_type;
     }
 
-    switch(face_type) {
-        case OCSFS_face_COMM: {
-            std::cout << "平静";
-        } break;
-        case OCSFS_face_HAPPY: {
-            std::cout << "开心";
-        } break;
-        case OCSFS_face_HADE: {
-            std::cout << "厌恶";
-        } break;
-        default: {
-            std::cout << "unknow";
-        }
-    }
+    QString status;
+    this->student_status_get(face_type, status);
+    std::cout << status.toStdString();
     std::cout << ": {" << std::endl;
 
     unsigned int img_idx = img_idx_start;
 
     /* 遍历目录中的所有文件 (code from ChatGPT) */
+    unsigned int out_img_idx = 0;
     for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
         if (img_idx - img_idx_start >= this->img_num) 
             break;
@@ -118,7 +144,7 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
             (".png" != entry.path().extension())) 
             continue;
 
-        std::cout << "载入第" << img_idx << "张: " << entry.path().string() << std::endl;
+        std::cout << "载入第" << out_img_idx << "张: " << entry.path().string() << std::endl;
 
         /* 将图像文件读入 Mat 对象 */
         cv::Mat frame = cv::imread(entry.path().string());
@@ -130,6 +156,7 @@ bool OCSFS_Module_Trainer::load_train_data(const QString& img_path,
         }
         
         img_idx++;
+        out_img_idx++;
     }
     std::cout << "};" << std::endl;
     
@@ -153,7 +180,7 @@ bool OCSFS_Module_Trainer::train_module_2_xml() {
      * * 惩罚系数控制了模型的过拟合程度。
      * * * 当惩罚系数较小时，模型容易出现过拟合现象；
      * * * 而当惩罚系数较大时，则容易出现欠拟合现象*/
-    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 100, 1e-6));
+    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 1000, 1e-10));
 
     /* 开始训练，
      * this->trans_mat表示训练数据矩阵，每一行代表一个样本，每一列代表该样本的一个特征；
@@ -184,72 +211,33 @@ bool OCSFS_Module_Trainer::train_module_test(const QString& img_path,
     int img_idx = (expected_face_type - OCSFS_FACE_BASE) / OCSFS_FACE_STEP  * this->img_num;
     int face_type = 0;
 
-    std::cout << "使用训练图片进行模型识别测试: " << std::endl;
+    std::cout << "使用训练图片进行模型识别测试不通过: " << std::endl;
 
-    switch(expected_face_type) {
-        case OCSFS_face_COMM: {
-            std::cout << "平静";
-        } break;
-        case OCSFS_face_HAPPY: {
-            std::cout << "开心";
-        } break;
-        case OCSFS_face_HADE: {
-            std::cout << "厌恶";
-        } break;
-        default: {
-            std::cout << "unknow";
-        }
-    }
+    QString expected_status;
+    this->student_status_get(expected_face_type, expected_status);
+    std::cout << expected_status.toStdString();
     std::cout << ": {" << std::endl;
+
     for (const auto & entry : ns_fs::directory_iterator(img_path.toStdString())) {
         /* 检查文件是否为图像 */
         if ((".jpg" != entry.path().extension()) &&
-            (".png" != entry.path().extension())) {
+            (".png" != entry.path().extension()) && 
+            (".JPG" != entry.path().extension()) && 
+            (".PNG" != entry.path().extension())) {
             continue;
         }
 
-        std::cout << "载入第" << img_idx++ << "张: " << entry.path().string() << std::endl;
 
         /* 将图像文件读入 Mat 对象 */
         // cv::Mat frame = cv::imread(entry.path().string());
         QImage frame;
         frame.load(QString::fromStdString(entry.path()));
 
-        
         ser.recognize(frame, face_type);
 
-        std::cout << "预期：";
-        switch(expected_face_type) {
-            case OCSFS_face_COMM: {
-                std::cout << "平静";
-            } break;
-            case OCSFS_face_HAPPY: {
-                std::cout << "开心";
-            } break;
-            case OCSFS_face_HADE: {
-                std::cout << "厌恶";
-            } break;
-            default: {
-                std::cout << "unknow";
-            }
+        if (expected_face_type != face_type) {
+            std::cout << entry.path().string() << std::endl;
         }
-        std::cout << "(" << expected_face_type << "), 识别结果: ";
-
-        switch(face_type) {
-            case OCSFS_face_COMM: {
-                std::cout << "平静";
-            } break;
-            case OCSFS_face_HAPPY: {
-                std::cout << "开心";
-            } break;
-            case OCSFS_face_HADE: {
-                std::cout << "厌恶";
-            } break;
-            default: {
-                std::cout << "unknow";
-            }
-        }
-        std::cout << "(" << face_type << ");" << std::endl;
         
     }
     std::cout << "};" << std::endl;

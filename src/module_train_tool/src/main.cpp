@@ -20,7 +20,7 @@ QStringList Trans_Images_Path = {
     "/happy", 
     "/hade", 
     "/angry", 
-    "/closeeyes", 
+    "/closeeye", 
     "/yawn"
 };
 

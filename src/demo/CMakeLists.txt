@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 可执行文件输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/ocsfs_mgr_cli)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/demo)
 
 set(TS_FILES OCSFS_zh_CN.ts)
 
@@ -20,7 +20,7 @@ include_directories(
     dlib::dlib
 )
 
-add_executable(ocsfs_mgr_cli
+add_executable(demo
     src/main.cpp
     src/ocsfs_window.cpp
     src/ocsfs_widget.cpp
@@ -32,7 +32,7 @@ add_executable(ocsfs_mgr_cli
     ${TS_FILES}
 )
 
-target_link_libraries(ocsfs_mgr_cli
+target_link_libraries(demo
     PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets
     ${OpenCV_LIBS}
     dlib::dlib

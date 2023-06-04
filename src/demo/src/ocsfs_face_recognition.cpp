@@ -96,7 +96,9 @@ bool OCSFS_Face_Recognition::cv_recognize(cv::Mat &frame,
         shapes.push_back(shape); 
 
         // for (int i = 0; i < 68; i++) {
-        //     circle(frame, cvPoint(shapes[0].part(i).x(), shapes[0].part(i).y()), 2, cv::Scalar(255, 0, 0), -1);
+        //     circle(frame, 
+        //         cvPoint(shapes[0].part(i).x(), shapes[0].part(i).y()), 
+        //         2, cv::Scalar(0, 255, 0), -1);
         // }
     }
     // cv::imwrite("./1.jpg", frame);

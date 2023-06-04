@@ -61,9 +61,11 @@
 #define OCSFS_face_CLOSEEYES   (OCSFS_FACE_BASE + 4 * OCSFS_FACE_STEP)
 /* 哈欠 */
 #define OCSFS_face_YAWN        (OCSFS_FACE_BASE + 5 * OCSFS_FACE_STEP)
+/* 惊讶 */
+#define OCSFS_face_SURPRISE    (OCSFS_FACE_BASE + 6 * OCSFS_FACE_STEP)
 
 /* 表情编号最大值 */
-#define OCSFS_FACE_MAX         (OCSFS_FACE_BASE + 5 * OCSFS_FACE_STEP)
+#define OCSFS_FACE_MAX         (OCSFS_FACE_BASE + 6 * OCSFS_FACE_STEP)
 
 /* 有多少中表情 */
 #define OCSFS_FACE_TYPE_NUM    ((OCSFS_FACE_MAX - OCSFS_FACE_BASE) / OCSFS_FACE_STEP)
@@ -84,7 +86,7 @@
 /* 用来训练的各类表情图片各有多少，
  * 注意：要保证每种表情的图片都有如下数量
  * */
-#define OCSFS_TRAIN_IMGS_NUM   (50)
+#define OCSFS_TRAIN_IMGS_NUM   (300)
 
 
 #define OCSFS_MGR_STU_INFO_DIALOG_HIGH (5)

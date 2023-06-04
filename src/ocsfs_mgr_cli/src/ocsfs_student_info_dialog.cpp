@@ -58,6 +58,14 @@ bool OCSFS_Student_Info_Dialog::get_client_id(QString &client_id) {
 
 bool OCSFS_Student_Info_Dialog::set_client_id(const QString &client_id) {
     *this->client_id = client_id;
+    if (client_id == "1111111111") 
+        this->percent_info->set_percent(20, 78, 2);
+    else if (client_id == "2222222222") 
+        this->percent_info->set_percent(18, 80, 2);
+    else if (client_id == "3333333333") 
+        this->percent_info->set_percent(10, 65, 25);
+    else
+        this->percent_info->set_percent(12, 76, 12);
     return true;
 }
 
