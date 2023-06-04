@@ -13,6 +13,7 @@
 #include <QImage>
 #include <QTcpSocket>
 #include <QMainWindow>
+#include <QSplitter>
 
 #include "ocsfs_widget.h"
 #include "ocsfs_client.h"

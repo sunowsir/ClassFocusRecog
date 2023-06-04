@@ -12,7 +12,8 @@ OCSFS_Window::OCSFS_Window(QWidget *parent)
     : QMainWindow(parent) {
 
     this->resize(800, 600);
-    this->setWindowTitle(tr("课堂状态监测系统演示程序"));
+
+    this->setWindowTitle(tr("面向线上教学的课堂状态反馈系统教师端"));
 
     this->connect_widget = new OCSFS_Connect_Widget(this);
     setCentralWidget(this->connect_widget);
@@ -78,6 +79,7 @@ void OCSFS_Window::connect_to_server_success() {
 /* 断开连接 */
 void OCSFS_Window::disconnected_from_server() {
     qDebug() << "与服务器断开连接";
+    this->setWindowTitle(tr("面向线上教学的课堂状态反馈系统教师端"));
 
     if (nullptr != this->connect_widget) {
         this->connect_widget->close();
@@ -147,6 +149,8 @@ void OCSFS_Window::login_to_server_success() {
 
 /* 握手失败 */
 void OCSFS_Window::handshake_failed() {
+    this->setWindowTitle(tr("面向线上教学的课堂状态反馈系统教师端"));
+
     this->ssi_widget->close();
     delete this->ssi_widget;
     this->ssi_widget = nullptr;

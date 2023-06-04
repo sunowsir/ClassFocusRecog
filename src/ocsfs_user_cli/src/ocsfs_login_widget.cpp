@@ -61,6 +61,9 @@ void OCSFS_Login_Widget::login_button_released() {
         return ;
     }
 
+    /* 修改窗口标题 */
+    this->parent->setWindowTitle(QString("学生: " + *this->account));
+
     /* 向服务器发送确认 */
     this->login_to_server(*this->account);
 }
