@@ -125,6 +125,10 @@ void OCSFS_Window::login_to_server_success() {
     QObject::connect(this->client_socket, SIGNAL(have_user_roll_call(QString&)), 
         this->ssi_widget, SLOT(have_user_roll_call(QString&)), Qt::AutoConnection);
 
+    /* 有学生发来警告响应 */
+    QObject::connect(this->client_socket, SIGNAL(have_user_warning_res(QString&)), 
+        this->ssi_widget, SLOT(have_user_warning_res(QString&)), Qt::AutoConnection);
+
     /* 有学生发来状态 */
     QObject::connect(this->client_socket, SIGNAL(have_user_status(QString&, int&)), 
         this->ssi_widget, SLOT(have_user_status(QString&, int&)), Qt::AutoConnection);
@@ -145,6 +149,9 @@ void OCSFS_Window::login_to_server_success() {
     QWidget::connect(this->ssi_widget, SIGNAL(rollcall_click(const QString&)), 
         this->client_socket, SLOT(slot_rollcall_click(const QString&)), Qt::AutoConnection);
 
+    /* 点击警告弹窗Ok按钮 */
+    QWidget::connect(this->ssi_widget, SIGNAL(click_send_warning(const QString&)), 
+        this->client_socket, SLOT(slot_click_send_warning(const QString&)), Qt::AutoConnection);
 }
 
 /* 握手失败 */

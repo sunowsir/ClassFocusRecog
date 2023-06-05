@@ -110,6 +110,7 @@ void OCSFS_Server::have_user_roll_call(const QString &src_client_id) {
 
 /* 有学生响应警告 */
 void OCSFS_Server::have_user_warning_res(const QString &src_client_id) {
+    qDebug() << "student recv warning: " << src_client_id;
     for (auto mgr_cli : *(this->mgr_clients)) 
         mgr_cli->send_have_user_warning_res(src_client_id);
 }

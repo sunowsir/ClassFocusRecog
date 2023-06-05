@@ -73,6 +73,7 @@ public slots:
 
     void slot_checkin_click();
     void slot_rollcall_click(const QString&);
+    void slot_click_send_warning(const QString&);
 };
 
 #endif

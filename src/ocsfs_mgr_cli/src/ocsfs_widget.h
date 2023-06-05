@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QPoint>
 #include <QTimer>
+#include <QTimer>
 #include <QImage>
 #include <QString>
 #include <QProcess>
@@ -68,6 +69,9 @@ private:
     QMap<QString, std::tuple<uint64_t, uint64_t>> *sleep_status_map;
 
     QMessageBox             *warning_box;
+
+    /* 定时器，用于定时检查每个学生的消极程度，显示警告提示弹窗，提醒教师发送警告 */
+    QTimer                  *warning_check_timer;
     
 private:
     bool student_status_type_get(int&, int&);
@@ -79,6 +83,7 @@ public:
 signals: 
     void checkin_click();
     void rollcall_click(const QString &);
+    void click_send_warning(const QString&);
 
 public slots:
     void have_user_check_in(QString&);
@@ -95,6 +100,10 @@ public slots:
 
     void slot_checkin_click();
     void slot_rollcall_click();
+
+    void slot_click_send_warning();
+
+    void slot_warning_check_timeout();
 };
 
 #endif

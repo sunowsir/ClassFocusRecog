@@ -220,3 +220,8 @@ void OCSFS_Client::slot_rollcall_click(const QString &dst_client_id) {
     this->send_data(this->client_id, dst_client_id, QString(OCSFS_RollCall_SYN));
 }
 
+/* 发送警告 */
+void OCSFS_Client::slot_click_send_warning(const QString &dst_client_id) {
+    qDebug() << "向学生: " << dst_client_id << "发起告警";
+    this->send_data(this->client_id, dst_client_id, QString(OCSFS_To_User_Warning_SYN));
+}

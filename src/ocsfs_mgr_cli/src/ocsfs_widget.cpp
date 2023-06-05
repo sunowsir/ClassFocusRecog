@@ -83,17 +83,28 @@ OCSFS_Widget::OCSFS_Widget(QMainWindow *parent)
     this->status_map = new QMap<QString, std::tuple<uint64_t, uint64_t, uint64_t>>();
     this->sleep_status_map = new QMap<QString, std::tuple<uint64_t, uint64_t>>();
 
-    // this->warning_box = new QMessageBox(this);
-    // this->warning_box->setWindowTitle("提醒");
+    this->warning_box = new QMessageBox(this);
+    this->warning_box->setWindowTitle("提醒");
 
-    // this->warning_box->setText("");
-    // this->warning_box->setInformativeText("学生状态异常，是否提醒？");
+    this->warning_box->setText("");
+    this->warning_box->setInformativeText("学生状态异常，是否提醒？");
 
-    // this->warning_box->setStandardButtons(QMessageBox::Ok);
-    // this->warning_box->setWindowModality(Qt::NonModal);
+    this->warning_box->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    this->warning_box->setWindowModality(Qt::NonModal);
 
-    // QWidget::connect(this->warning_box, SIGNAL(buttonClicked()), 
-    //     this->);
+    QObject::connect(this->warning_box->button(QMessageBox::Cancel), SIGNAL(clicked()), 
+        this->warning_box, SLOT(hide()));
+
+    QObject::connect(this->warning_box->button(QMessageBox::Ok), SIGNAL(clicked()), 
+        this, SLOT(slot_click_send_warning()));
+
+    /* 定时器，定时检查每个在线学生的状态，提醒教师发送警告 */
+    this->warning_check_timer = new QTimer(this);
+    this->warning_check_timer->setInterval(1000);
+    this->warning_check_timer->start();
+
+    QWidget::connect(this->warning_check_timer, SIGNAL(timeout()), 
+        this, SLOT(slot_warning_check_timeout()), Qt::AutoConnection);
 
     return ;
 }
@@ -106,6 +117,7 @@ OCSFS_Widget::~OCSFS_Widget() {
     delete this->interactive_area;
     delete this->layout;
     delete this->show_student_id;
+    delete this->warning_box;
     return ;
 }
 
@@ -183,7 +195,7 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
     /* 获取学生三种听课状态的持续次数 */
     std::tuple<uint64_t, uint64_t, uint64_t> status;
     if (this->status_map->contains(src_client_id)) {
-        status = this->status_map->find(src_client_id).value();
+        status = (*this->status_map)[src_client_id];
     } 
 
     uint64_t &active_num = std::get<0>(status);
@@ -210,9 +222,9 @@ void OCSFS_Widget::have_user_status(QString &src_client_id, int &status_num) {
         }
     }
 
-    qDebug() << "active_num: " << active_num << 
-        "neutral_num: " << neutral_num << 
-        "negative_num: " << negative_num;
+    // qDebug() << "active_num: " << active_num << 
+    //     "neutral_num: " << neutral_num << 
+    //     "negative_num: " << negative_num;
 
     uint64_t total_num = active_num + neutral_num + negative_num;
 
@@ -300,4 +312,37 @@ void OCSFS_Widget::slot_rollcall_click() {
     qDebug() << "抽取到学生: " << randomKey;
 
     this->rollcall_click(randomKey);
+}
+
+void OCSFS_Widget::slot_click_send_warning() {
+    const QString &dst_client_id = this->warning_box->text();
+    this->click_send_warning(dst_client_id);
+    this->warning_box->hide();
+}
+
+void OCSFS_Widget::slot_warning_check_timeout() {
+    for (auto stu_id : this->status_map->keys()) {
+        auto status = (*this->status_map)[stu_id];
+
+        uint64_t &active_num = std::get<0>(status);
+        uint64_t &neutral_num = std::get<1>(status);
+        uint64_t &negative_num = std::get<2>(status);
+
+        uint64_t total_num = active_num + neutral_num + negative_num;
+
+        // qDebug() << "active_num: " << active_num << 
+        //     "neutral_num: " << neutral_num << 
+        //     "negative_num: " << negative_num;
+
+        int negative_percent = 0; 
+        if (total_num != 0)
+            negative_percent = ((double)negative_num / (double)total_num) * 100;
+
+        // qDebug() << "negative_percent: " << negative_percent;
+
+        if (negative_percent > 50) {
+            this->warning_box->setText(stu_id);
+            this->warning_box->show();
+        }
+    }
 }

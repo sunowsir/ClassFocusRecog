@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QString>
 #include <QBuffer>
+#include <QtEndian>
 #include <QTcpSocket>
 #include <QByteArray>
 #include <QMainWindow>
@@ -41,6 +42,7 @@ private:
 private:
     bool send_data(const QString&, const QString&, const QString&);
     bool send_data_by_byte(const QString&, const QString&, const QByteArray&);
+    bool parse_data(QString&, QString&, const QByteArray&, QByteArray&, int&);
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
     bool step2_handler(const QString&, QByteArray &recv_data);

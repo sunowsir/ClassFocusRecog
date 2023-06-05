@@ -55,6 +55,7 @@ private:
     OCSFS_Profileface_Recognition           *opr;
 
 private: 
+    bool parse_data(QString&, QString&, const QByteArray&, QByteArray&, int&);
     bool step0_handler(QByteArray &recv_data);
     bool step1_handler(QByteArray &recv_data);
     bool step2_handler(const QString &src_client_id, 

@@ -68,29 +68,64 @@ void OCSFS_Client::recv_data() {
 
     if (recv_data.size() < (long long int)OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
-        this->send_data(OCSFS_SERVER_ID, this->client_id, QString("error"));
+        this->send_data(this->client_id, OCSFS_SERVER_ID, QString("error"));
+        return ;
     }
-    
-    QString src_client_id = QString::fromUtf8(recv_data.mid(0, OCSFS_CLIENT_ID_LEN));
-    QString dst_client_id = QString::fromUtf8(recv_data.mid(OCSFS_CLIENT_ID_LEN, OCSFS_CLIENT_ID_LEN));
-    
-    recv_data.remove(0, OCSFS_PROTO_HEAD_LEN);
-    
-    /* 处理服务器发来的消息 */
-    switch (this->step) {
-        case 0: {
-            this->step0_handler(recv_data);
-        } break;
-        case 1: {
-            this->step1_handler(recv_data);
-        } break;
-        case 2: {
-            this->step2_handler(src_client_id, recv_data);
-        } break;
-        default: {
-            qDebug() << "step error";
-        };
+
+    int recv_data_idx = 0;
+    while ((recv_data_idx <= recv_data.size()) && 
+        (recv_data.size() - recv_data_idx + 1) >= (long long int)OCSFS_PROTO_HEAD_LEN) {
+        QString src_client_id;
+        QString dst_client_id;
+        int data_len = 0;
+        QByteArray data = "";
+        this->parse_data(src_client_id, dst_client_id, 
+            recv_data + recv_data_idx, 
+            data, data_len);
+
+        recv_data_idx += OCSFS_PROTO_HEAD_LEN + data_len;
+
+        /* 处理服务器发来的消息 */
+        switch (this->step) {
+            case 0: {
+                this->step0_handler(data);
+            } break;
+            case 1: {
+                this->step1_handler(data);
+            } break;
+            case 2: {
+                this->step2_handler(src_client_id, data);
+            } break;
+            default: {
+                qDebug() << "step error";
+            };
+        }
+
     }
+}
+
+bool OCSFS_Client::parse_data(QString &src_client_id, 
+    QString &dst_client_id, 
+    const QByteArray &recv_data, 
+    QByteArray &data, 
+    int &data_len) {
+
+    src_client_id = QString::fromUtf8(recv_data.mid(0, OCSFS_CLIENT_ID_LEN));
+    dst_client_id = QString::fromUtf8(recv_data.mid(OCSFS_CLIENT_ID_LEN, OCSFS_CLIENT_ID_LEN));
+    int step = recv_data.mid(OCSFS_CLIENT_ID_LEN * 2, 1).toHex().toInt(nullptr, 10);
+
+    int network_data_len;
+    std::memcpy(&network_data_len, 
+        recv_data.mid(OCSFS_CLIENT_ID_LEN * 2 + 1, sizeof(int)).constData(), 
+        sizeof(int));
+    data_len = qFromBigEndian(network_data_len);
+
+    if (data_len <= 0) 
+        return true;
+
+    data = recv_data.mid(OCSFS_PROTO_HEAD_LEN, data_len);
+    
+    return true;
 }
 
 bool OCSFS_Client::step0_handler(QByteArray &recv_data) {
@@ -132,11 +167,9 @@ bool OCSFS_Client::step2_handler(const QString &src_client_id, QByteArray &recv_
     /* 有教师发起签到 */
     if (QString(recv_data) == QString(OCSFS_CheckIn_SYN)) {
         this->have_mgr_check_in(src_client_id);
-        return true;
     /* 有教师向某个学生发起点名 */
     } else if (QString(recv_data) == QString(OCSFS_RollCall_SYN)) {
         this->have_mgr_roll_call(src_client_id);
-        return true;
     /* 有教师端向某个学生发起警告 */
     } else if (QString(recv_data) == QString(OCSFS_To_User_Warning_SYN)) {
         this->have_mgr_warning(src_client_id);

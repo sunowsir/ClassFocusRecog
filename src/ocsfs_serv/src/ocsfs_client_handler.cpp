@@ -34,7 +34,8 @@ OCSFS_Client_Handler::~OCSFS_Client_Handler() {
 }
 
 bool OCSFS_Client_Handler::get_map_key(QString &map_key) {
-    map_key = this->ip + QString(static_cast<QChar>(this->port));
+    // map_key = this->ip + QString(static_cast<QChar>(this->port));
+    map_key = this->client_id;
     return true;
 }
 
@@ -71,6 +72,7 @@ void OCSFS_Client_Handler::send_have_user_roll_call(const QString &src_client_id
 
 /* 转发学生警告响应 */
 void OCSFS_Client_Handler::send_have_user_warning_res(const QString &src_client_id) {
+    qDebug() << "student recv warning: " << src_client_id;
     this->send_data(src_client_id, this->client_id, QString(OCSFS_To_User_Warning_ACK));
 }
 
@@ -92,6 +94,30 @@ void OCSFS_Client_Handler::send_have_mgr_warning(const QString &src_client_id) {
 /* 向教师端发送有学生上线消息 */
 void OCSFS_Client_Handler::have_user_ready(const QString &src_client_id) {
     this->send_data(src_client_id, this->client_id, QString(OCSFS_User_Ready_SYN));
+}
+
+bool OCSFS_Client_Handler::parse_data(QString &src_client_id, 
+    QString &dst_client_id, 
+    const QByteArray &recv_data, 
+    QByteArray &data, 
+    int &data_len) {
+
+    src_client_id = QString::fromUtf8(recv_data.mid(0, OCSFS_CLIENT_ID_LEN));
+    dst_client_id = QString::fromUtf8(recv_data.mid(OCSFS_CLIENT_ID_LEN, OCSFS_CLIENT_ID_LEN));
+    int step = recv_data.mid(OCSFS_CLIENT_ID_LEN * 2, 1).toHex().toInt(nullptr, 10);
+
+    int network_data_len;
+    std::memcpy(&network_data_len, 
+        recv_data.mid(OCSFS_CLIENT_ID_LEN * 2 + 1, sizeof(int)).constData(), 
+        sizeof(int));
+    data_len = qFromBigEndian(network_data_len);
+
+    if (data_len <= 0) 
+        return true;
+
+    data = recv_data.mid(OCSFS_PROTO_HEAD_LEN, data_len);
+    
+    return true;
 }
 
 /* 确认身份 */
@@ -150,6 +176,7 @@ bool OCSFS_Client_Handler::step2_handler(const QString &src_client_id,
     } else if (QString(recv_data) == QString(OCSFS_RollCall_SYN)) {
         this->have_mgr_roll_call(src_client_id, dst_client_id);
         return true;
+    /* 有教师发起警告 */
     } else if (QString(recv_data) == QString(OCSFS_To_User_Warning_SYN)) {
         this->have_mgr_warning(src_client_id, dst_client_id);
         return true;
@@ -255,27 +282,38 @@ void OCSFS_Client_Handler::recv_data() {
 
     if (recv_data.size() < (long long int)OCSFS_PROTO_HEAD_LEN) {
         this->step = 0;
-        this->send_data(OCSFS_SERVER_ID, this->client_id, QString("error"));
-        qDebug() << "data len error: " << recv_data.size();
+        this->send_data(this->client_id, OCSFS_SERVER_ID, QString("error"));
+        return ;
     }
-    
-    QString src_client_id = QString::fromUtf8(recv_data.mid(0, OCSFS_CLIENT_ID_LEN));
-    QString dst_client_id = QString::fromUtf8(recv_data.mid(OCSFS_CLIENT_ID_LEN, OCSFS_CLIENT_ID_LEN));
 
-    recv_data.remove(0, OCSFS_PROTO_HEAD_LEN);
-    
-    switch (this->step) {
-        case 0: {
-            this->step0_handler(recv_data);
-        } break;
-        case 1: {
-            this->step1_handler(recv_data);
-        } break;
-        case 2: {
-            this->step2_handler(src_client_id, dst_client_id, recv_data);
-        } break;
-        default: {
-            qDebug() << "step error";
-        };
+    int recv_data_idx = 0;
+    while ((recv_data_idx <= recv_data.size()) && 
+        (recv_data.size() - recv_data_idx + 1) >= (long long int)OCSFS_PROTO_HEAD_LEN) {
+        QString src_client_id;
+        QString dst_client_id;
+        int data_len = 0;
+        QByteArray data = "";
+        this->parse_data(src_client_id, dst_client_id, 
+            recv_data + recv_data_idx, 
+            data, data_len);
+
+        recv_data_idx += OCSFS_PROTO_HEAD_LEN + data_len;
+
+        /* 处理服务器发来的消息 */
+        switch (this->step) {
+            case 0: {
+                this->step0_handler(data);
+            } break;
+            case 1: {
+                this->step1_handler(data);
+            } break;
+            case 2: {
+                this->step2_handler(src_client_id, dst_client_id, data);
+            } break;
+            default: {
+                qDebug() << "step error";
+            };
+        }
+
     }
 }
