@@ -222,7 +222,7 @@ bool OCSFS_Client_Handler::step2_handler(const QString &src_client_id,
     this->image_recognize_over(this->client_id, QString::number(face_type));
 
     /* 将实时图片也发过去 */
-    this->have_send_image_to_mgr(this->client_id, recv_image);
+    this->have_send_image_to_mgr(this->client_id, out_image);
 
     return true;
 }

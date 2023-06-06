@@ -59,7 +59,7 @@ bool OCSFS_Expression_Recognition::recognize(const QImage& img, QImage& out_img,
 
         /* 在图片上把68特征点标注出来 */
         cv::circle(frame, 
-            cvPoint(shapes[0].part(i).x(), shapes[0].part(i).y()), 2, cv::Scalar(255, 0, 0), -1);
+            cvPoint(shapes[0].part(i).x(), shapes[0].part(i).y()), 2, cv::Scalar(0, 255, 0), -1);
     }
 
     if (!sic.mat_2_qimage(frame, out_img)) {
