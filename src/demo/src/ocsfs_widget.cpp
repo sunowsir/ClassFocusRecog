@@ -209,7 +209,10 @@ void OCSFS_Widget::slots_capture_camera_frame(int id, const QImage& frameImage) 
 #if 1
     int face_type = 0;
     QImage out_image;
-    this->ser->recognize(frameImage, out_image, face_type);
+    QImage tmp_input_img;
+    tmp_input_img.load("1.png");
+    // this->ser->recognize(frameImage, out_image, face_type);
+    this->ser->recognize(tmp_input_img, out_image, face_type);
 
     QString face_type_str = "result: ";
     switch(face_type) {

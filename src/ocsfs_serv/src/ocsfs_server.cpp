@@ -7,16 +7,23 @@
 */
 
 #include "ocsfs_server.h"
+#include <iostream>
 
 OCSFS_Server::OCSFS_Server() {
+    std::cout << "11";
     this->mgr_clients = new QMap<QString, OCSFS_Client_Handler*>();
+    std::cout << "12";
     this->user_clients = new QMap<QString, OCSFS_Client_Handler*>();
+    std::cout << "13";
 
     this->tcp_server = new QTcpServer(this);
+    std::cout << "14";
     this->tcp_server->listen(QHostAddress::Any, OCSFS_SERVER_CTL_PORT);
+    std::cout << "15";
 
     QObject::connect(this->tcp_server, SIGNAL(newConnection()), 
         this, SLOT(fetchSocket()), Qt::AutoConnection);
+    std::cout << "16";
 }
 
 OCSFS_Server::~OCSFS_Server() {

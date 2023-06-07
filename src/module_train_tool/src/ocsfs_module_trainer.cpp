@@ -182,6 +182,8 @@ bool OCSFS_Module_Trainer::train_module_2_xml() {
      * * * 而当惩罚系数较大时，则容易出现欠拟合现象*/
     svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 1000, 1e-10));
 
+    svm->setC(20);
+
     /* 开始训练，
      * this->trans_mat表示训练数据矩阵，每一行代表一个样本，每一列代表该样本的一个特征；
      * ROW_SAMPLE参数表示样本矩阵的每一行代表一个样本，即每个样本都以行向量的形式出现
